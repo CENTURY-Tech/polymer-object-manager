@@ -1,0 +1,19 @@
+{
+  "name": "ct-object-management",
+  "version": "0.0.0",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ],
+  "dependencies": {
+    "es6-shim": "~0",
+    "js-imports": "~1",
+    "polymer": "1.7.0"
+  },
+  "devDependencies": {
+    "polymer-ts": "0.1.28",
+    "web-component-tester": "4.3.1",
+    "webcomponentsjs": "0.7.23"
+  }
+}

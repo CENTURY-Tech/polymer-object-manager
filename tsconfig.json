@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "alwaysStrict": true,
+    "skipLibCheck": true,
+    "noUnusedLocals": true,
+    "removeComments": true,
+    "experimentalDecorators": true
+  },
+  "include": [
+    "./src",
+    "./typings"
+  ],
+  "exclude": [
+    "./bower_components",
+    "./node_modules"
+  ]
+}

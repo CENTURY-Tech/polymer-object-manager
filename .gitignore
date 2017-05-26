@@ -1,0 +1,16 @@
+# IDE related paths
+.vscode
+
+# Dependency directories
+bower_components
+node_modules
+typings
+.bowerrc
+.npmrc
+
+# Log files
+npm-debug.log
+
+# Build files
+/test
+/object-management.*
