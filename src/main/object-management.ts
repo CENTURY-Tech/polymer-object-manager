@@ -52,7 +52,6 @@ namespace Century {
 
     @observe("target.*")
     public handleTargetUpdated(diff: { base: T, path: string }): void {
-      console.log(diff);
       // We ignore whenever a property is updated prefixed with a "$".
       if (/\.\$/.test(diff.path)) {
         return;
