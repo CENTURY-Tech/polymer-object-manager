@@ -2,10 +2,6 @@ namespace Century {
 
   type ValidationError = ZSchema.SchemaErrorDetail;
 
-  const validator = new ZSchema({
-    breakOnFirstError: false
-  });
-
   /**
    * Object Management behaviour.
    *
@@ -29,27 +25,65 @@ namespace Century {
     public schema: object;
 
     /**
-     * An backup of the original "target".
+     * A backup of the original "target".
      */
     private original: T;
 
+    /**
+     * An instance of the ZSchema class, used for validation purposes.
+     */
+    private validator: ZSchema;
+
+    /**
+     * This lifecycle method is used as a constructor, as constructors are not called on Behaviours. This limitation
+     * prevents us from initialising the required private variables within the declaration of the class properties when
+     * transpiling down to ES5. Because Typescript + Polymer = A big bag of fun...
+     *
+     * @returns {Void}
+     */
+    public created(): void {
+      this.validator = new ZSchema({ breakOnFirstError: false });
+    }
+
+    /**
+     * @todo Complete and document this method.
+     */
     public async persistChanges(): Promise<void> {
       //
     }
 
+    /**
+     * This method will reset the target Object to it's original state.
+     *
+     * @returns {Void}
+     */
     public resetChanges(): void {
-      this.set("target", R.clone(this.original));
+      this.set("target", this.original);
     }
 
+    /**
+     * This method will validate the target Object against the provided schema, if available. After validating the
+     * target Object, any errors generated during the validation process will be processed.
+     *
+     * @returns {Void}
+     */
     public validateChanges(): void {
-      if (!this.target || !this.schema) {
+      if (!this.target || !this.schema || !this.validator) {
         return;
-
       }
-      validator.validate(this.target, this.schema);
-      this.processTargetErrors(validator.getLastErrors());
+
+      this.validator.validate(this.target, this.schema);
+      this.processTargetErrors(this.validator.getLastErrors());
     }
 
+    /**
+     * This method will handle any updates made to the target Object. If the Object is being set, a clone will be made
+     * and referenced for later usage. If however, Object is being updated, it is marked as dirty, and then validated.
+     *
+     * @param {Object} diff - A Polymer diff Object
+     *
+     * @returns {Void}
+     */
     @observe("target.*")
     public handleTargetUpdated(diff: { base: T, path: string }): void {
       // We ignore whenever a property is updated prefixed with a "$".
@@ -73,7 +107,7 @@ namespace Century {
      * This method will mark the Object at the lookup path provided as pristine (that is untouched). This will falsify
      * the "$dirty" flag at the lookup path specified on the target and make the "$pristine" flag truthy.
      *
-     * @param {String[]} path - An Array of Object keys forming a lookup path
+     * @param {String[]=} path - An Array of Object keys forming a lookup path
      *
      * @returns {Void}
      */
@@ -88,7 +122,7 @@ namespace Century {
      * This method will mark the Object at the lookup path provided as as dirty (that it has had changes made). This
      * will falsify the "$pristine" flag at the lookup path specified on the target and make the "$dirty" flag truthy.
      *
-     * @param {String[]} path - An Array of Object keys forming a lookup path
+     * @param {String[]=} path - An Array of Object keys forming a lookup path
      *
      * @returns {Void}
      */
@@ -103,7 +137,7 @@ namespace Century {
      * This method will mark the Object at the lookup path provided as valid. This will falsify the "$invalid" flag, and
      * make the "$valid" flag truthy.
      *
-     * @param {String[]} path - An Array of Object keys forming a lookup path
+     * @param {String[]=} path - An Array of Object keys forming a lookup path
      *
      * @returns {Void}
      */
@@ -118,7 +152,7 @@ namespace Century {
      * This method will mark the Object at the lookup path provided as invalid. This will falsify the "$valid" flag, and
      * make the "$invalid" flag truthy.
      *
-     * @param {String[]} path - An Array of Object keys forming a lookup path
+     * @param {String[]=} path - An Array of Object keys forming a lookup path
      *
      * @returns {Void}
      */
@@ -208,6 +242,15 @@ namespace Century {
 
   export namespace ObjectManagement {
 
+    /**
+     * This method breaks down the provided Object into it's constituent parts and returns an Array of Arrays, where
+     * each Subarray contains a lookup string at the zeroth index, and a reference to the value held at that lookup
+     * string in the first index.
+     *
+     * @param {Object} obj - The Object to be deconstructed
+     *
+     * @returns {[String, Any][]} An Array of the Objects constituent parts
+     */
     export const deconstructObject: <T extends object>(obj: T) => Array<[string, any]> = R.compose<any, any, any>(
       R.chain(([key1, value1]: [string, any]): string[][] => {
         if (typeof value1 === "object") {
@@ -219,7 +262,17 @@ namespace Century {
       R.toPairs
     );
 
-    export function walkObjectFor<T extends object>(obj: T, type: any): Array<[string, any]> {
+    /**
+     * This method will search through the provided Object for values that match the provided type. It will then return
+     * an Array of Arrays, where each Subarray contians a lookup string to the match at the zeroth index, and then a
+     * reference to the match in the first index.
+     *
+     * @param {Object} obj  - The Object to be searched
+     * @param {Object} type - The type to search for
+     *
+     * @returns {[String, Any][]} An Array of matches found in the Object for the specified type
+     */
+    export function walkObjectFor<T extends object, U extends object>(obj: T, type: U): Array<[string, any]> {
       return R.filter<[string, any]>(R.pipe(R.nth(1), R.is(type)), deconstructObject(obj));
     }
 
@@ -253,19 +306,7 @@ namespace Century {
      * @returns {String} An Array of Object keys forming a lookup path
      */
     export function lookupToPath(lookup: string = ""): string[] {
-      return R.split(".", lookup);
-    }
-
-    /**
-     * Retrieve the errors from the Array of errors provided that point to the path provided.
-     *
-     * @param {Object[]} errors - The Array of validation errors
-     * @param {String}   path   - The error path to filter by
-     *
-     * @returns {Object[]} An Array of errors with the path provided
-     */
-    export function getErrorsForPath<T extends ValidationError>(errors: T[], path: string): T[] {
-      return R.filter<T>(R.propEq("path", path))(errors);
+      return R.compose(R.reject<string>(R.isEmpty), R.split("."))(lookup);
     }
 
     /**
@@ -278,7 +319,7 @@ namespace Century {
      * @returns {Object[]} An Array of errors stemming from the root provided
      */
     export function getErrorsForRoot<T extends ValidationError>(errors: T[], root: string, recursive?: boolean): T[] {
-      return R.filter<T>(R.propSatisfies(R.test(RegExp(`^${root}${!recursive ? "\w+$" : ""}`)), "path"))(errors);
+      return R.filter<T>(R.propSatisfies(R.test(RegExp(`^${root}${recursive ? "" : "$"}`)), "path"))(errors);
     }
 
   }
