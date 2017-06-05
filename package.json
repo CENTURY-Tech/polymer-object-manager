@@ -34,7 +34,7 @@
   "devDependencies": {
     "@ctek/gulp-tasks": "6.0.6",
     "@ctek/typed-utils": "1.1.1",
-    "@types/chai": "3.4.34",
+    "@types/chai": "4.0.0",
     "@types/es6-shim": "0.31.32",
     "@types/mocha": "2.2.39",
     "@types/polymer-ts": "0.1.28",

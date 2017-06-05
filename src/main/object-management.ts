@@ -1,5 +1,6 @@
 namespace Century {
 
+  type ObjectPart = [string, any];
   type ValidationError = ZSchema.SchemaErrorDetail;
 
   /**
@@ -73,7 +74,7 @@ namespace Century {
       }
 
       this.validator.validate(this.target, this.schema);
-      this.processTargetErrors(this.validator.getLastErrors());
+      this.processTargetErrors(this.validator.getLastErrors() || []);
     }
 
     /**
@@ -85,19 +86,19 @@ namespace Century {
      * @returns {Void}
      */
     @observe("target.*")
-    public handleTargetUpdated(diff: { base: T, path: string }): void {
+    public handleTargetUpdated(diff: { base: T, path: string }): void | boolean {
       // We ignore whenever a property is updated prefixed with a "$".
       if (/\.\$/.test(diff.path)) {
-        return;
+        return false;
       }
 
       if (/^target$/.test(diff.path)) {
         this.original = R.clone(diff.base);
 
         this.prepareTargetRoots();
-        this.markTargetPathAsPristine();
+        this.markTargetPathAsPristine([]);
       } else {
-        this.markTargetPathAsDirty();
+        this.markTargetPathAsDirty([]);
       }
 
       return this.validateChanges();
@@ -107,11 +108,11 @@ namespace Century {
      * This method will mark the Object at the lookup path provided as pristine (that is untouched). This will falsify
      * the "$dirty" flag at the lookup path specified on the target and make the "$pristine" flag truthy.
      *
-     * @param {String[]=} path - An Array of Object keys forming a lookup path
+     * @param {String[]} path - An Array of Object keys forming a lookup path
      *
      * @returns {Void}
      */
-    private markTargetPathAsPristine(path: string[] = []): void {
+    private markTargetPathAsPristine(path: string[]): void {
       const lookup = ObjectManagement.pathToLookup(["target", ...path]);
 
       this.set(`${lookup}.$dirty`, false);
@@ -122,11 +123,11 @@ namespace Century {
      * This method will mark the Object at the lookup path provided as as dirty (that it has had changes made). This
      * will falsify the "$pristine" flag at the lookup path specified on the target and make the "$dirty" flag truthy.
      *
-     * @param {String[]=} path - An Array of Object keys forming a lookup path
+     * @param {String[]} path - An Array of Object keys forming a lookup path
      *
      * @returns {Void}
      */
-    private markTargetPathAsDirty(path: string[] = []): void {
+    private markTargetPathAsDirty(path: string[]): void {
       const lookup = ObjectManagement.pathToLookup(["target", ...path]);
 
       this.set(`${lookup}.$dirty`, true);
@@ -137,11 +138,11 @@ namespace Century {
      * This method will mark the Object at the lookup path provided as valid. This will falsify the "$invalid" flag, and
      * make the "$valid" flag truthy.
      *
-     * @param {String[]=} path - An Array of Object keys forming a lookup path
+     * @param {String[]} path - An Array of Object keys forming a lookup path
      *
      * @returns {Void}
      */
-    private markTargetPathAsValid(path: string[] = []): void {
+    private markTargetPathAsValid(path: string[]): void {
       const lookup = ObjectManagement.pathToLookup(["target", ...path]);
 
       this.set(`${lookup}.$valid`, true);
@@ -152,11 +153,11 @@ namespace Century {
      * This method will mark the Object at the lookup path provided as invalid. This will falsify the "$valid" flag, and
      * make the "$invalid" flag truthy.
      *
-     * @param {String[]=} path - An Array of Object keys forming a lookup path
+     * @param {String[]} path - An Array of Object keys forming a lookup path
      *
      * @returns {Void}
      */
-    private markTargetPathAsInvalid(path: string[] = []): void {
+    private markTargetPathAsInvalid(path: string[]): void {
       const lookup = ObjectManagement.pathToLookup(["target", ...path]);
 
       this.set(`${lookup}.$valid`, false);
@@ -195,7 +196,7 @@ namespace Century {
      * @returns {Void}
      */
     private prepareTargetRoots(): void {
-      for (const [lookup] of ObjectManagement.walkObjectFor(this.target, Object)) {
+      for (const [lookup] of this.generateDeconstructedTarget()) {
         const path = ObjectManagement.lookupToPath(lookup);
         const root = ObjectManagement.pathToRoot(path);
 
@@ -211,7 +212,7 @@ namespace Century {
      * @returns {Void}
      */
     private processTargetErrors(errors: ValidationError[]): void {
-      for (const [lookup] of ObjectManagement.walkObjectFor(this.target, Object)) {
+      for (const [lookup] of this.generateDeconstructedTarget()) {
         const path = ObjectManagement.lookupToPath(lookup);
         const root = ObjectManagement.pathToRoot(path);
 
@@ -232,10 +233,20 @@ namespace Century {
       this.setTargetPathErrors(errors, path);
 
       if (!errors.length) {
-        this.markTargetPathAsValid();
+        this.markTargetPathAsValid(path);
       } else {
-        this.markTargetPathAsInvalid();
+        this.markTargetPathAsInvalid(path);
       }
+    }
+
+    /**
+     * This method will deconstruct the target Object into it's constituent parts, however, it will only search for
+     * Objects. The root of the target Object is also prepended to the list of Object parts.
+     *
+     * @returns {[String, Any][]} An Array of the target Object's constituent parts including it's root
+     */
+    private generateDeconstructedTarget(): ObjectPart[] {
+      return R.prepend<ObjectPart>(["", this.target], ObjectManagement.walkObjectFor(this.target, Object));
     }
 
   }
@@ -249,11 +260,13 @@ namespace Century {
      *
      * @param {Object} obj - The Object to be deconstructed
      *
-     * @returns {[String, Any][]} An Array of the Objects constituent parts
+     * @returns {[String, Any][]} An Array of the Object's constituent parts
      */
-    export const deconstructObject: <T extends object>(obj: T) => Array<[string, any]> = R.compose<any, any, any>(
-      R.chain(([key1, value1]: [string, any]): string[][] => {
-        if (typeof value1 === "object") {
+    export const deconstructObject: <T extends object>(obj: T) => ObjectPart[] = R.compose<any, any, any>(
+      R.chain(([key1, value1]: ObjectPart): any => {
+        if (key1.startsWith("$")) {
+          return [];
+        } else if (typeof value1 === "object") {
           return [[key1, value1], ...R.map(([key2, value2]) => [`${key1}.${key2}`, value2], deconstructObject(value1))];
         } else {
           return [[key1, value1]];
@@ -272,8 +285,8 @@ namespace Century {
      *
      * @returns {[String, Any][]} An Array of matches found in the Object for the specified type
      */
-    export function walkObjectFor<T extends object, U extends object>(obj: T, type: U): Array<[string, any]> {
-      return R.filter<[string, any]>(R.pipe(R.nth(1), R.is(type)), deconstructObject(obj));
+    export function walkObjectFor<T extends object, U extends Function>(obj: T, type: U): ObjectPart[] {
+      return R.filter<ObjectPart>(R.pipe(R.nth(1), (x) => (x instanceof type)), deconstructObject(obj));
     }
 
     /**
@@ -283,7 +296,7 @@ namespace Century {
      *
      * @returns {String} A root built from the lookup path provided
      */
-    export function pathToRoot(path: string[] = []): string {
+    export function pathToRoot(path: string[]): string {
       return `#/${R.join("/", path)}`;
     }
 
@@ -294,7 +307,7 @@ namespace Century {
      *
      * @returns {String} A single lookup string built from the lookup path provided
      */
-    export function pathToLookup(path: string[] = []): string {
+    export function pathToLookup(path: string[]): string {
       return R.join(".", path);
     }
 
@@ -305,7 +318,7 @@ namespace Century {
      *
      * @returns {String} An Array of Object keys forming a lookup path
      */
-    export function lookupToPath(lookup: string = ""): string[] {
+    export function lookupToPath(lookup: string): string[] {
       return R.compose(R.reject<string>(R.isEmpty), R.split("."))(lookup);
     }
 
