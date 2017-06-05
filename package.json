@@ -15,7 +15,7 @@
     "build:html-test": "(cd src/test && tar -cf - `find . -name '*.html'`) | (cd test && tar -xf -)",
     "clean": "npm run clean:build",
     "clean:build": "npm run clean:build-main && npm run clean:build-test",
-    "clean:build-main": "rm -drf course-editor.* behaviours elements utils",
+    "clean:build-main": "rm -drf object-management.* utils",
     "clean:build-test": "rm -drf test",
     "install": "bower i && typings i",
     "lint": "npm run lint:main && npm run lint:test",

@@ -1,6 +1,5 @@
 namespace Century {
 
-  type ObjectPart = [string, any];
   type ValidationError = ZSchema.SchemaErrorDetail;
 
   /**
@@ -113,7 +112,7 @@ namespace Century {
      * @returns {Void}
      */
     private markTargetPathAsPristine(path: string[]): void {
-      const lookup = ObjectManagement.pathToLookup(["target", ...path]);
+      const lookup = OMPathUtils.pathToLookup(["target", ...path]);
 
       this.set(`${lookup}.$dirty`, false);
       this.set(`${lookup}.$pristine`, true);
@@ -128,7 +127,7 @@ namespace Century {
      * @returns {Void}
      */
     private markTargetPathAsDirty(path: string[]): void {
-      const lookup = ObjectManagement.pathToLookup(["target", ...path]);
+      const lookup = OMPathUtils.pathToLookup(["target", ...path]);
 
       this.set(`${lookup}.$dirty`, true);
       this.set(`${lookup}.$pristine`, false);
@@ -143,7 +142,7 @@ namespace Century {
      * @returns {Void}
      */
     private markTargetPathAsValid(path: string[]): void {
-      const lookup = ObjectManagement.pathToLookup(["target", ...path]);
+      const lookup = OMPathUtils.pathToLookup(["target", ...path]);
 
       this.set(`${lookup}.$valid`, true);
       this.set(`${lookup}.$invalid`, false);
@@ -158,7 +157,7 @@ namespace Century {
      * @returns {Void}
      */
     private markTargetPathAsInvalid(path: string[]): void {
-      const lookup = ObjectManagement.pathToLookup(["target", ...path]);
+      const lookup = OMPathUtils.pathToLookup(["target", ...path]);
 
       this.set(`${lookup}.$valid`, false);
       this.set(`${lookup}.$invalid`, true);
@@ -174,7 +173,7 @@ namespace Century {
      * @returns {Void}
      */
     private setTargetPathRoot(root: string, path: string[]): void {
-      this.set(`${ObjectManagement.pathToLookup(["target", ...path])}.$root`, root);
+      this.set(`${OMPathUtils.pathToLookup(["target", ...path])}.$root`, root);
     }
 
     /**
@@ -187,7 +186,7 @@ namespace Century {
      * @returns {Void}
      */
     private setTargetPathErrors(errors: ValidationError[], path: string[]): void {
-      this.set(`${ObjectManagement.pathToLookup(["target", ...path])}.$errors`, errors);
+      this.set(`${OMPathUtils.pathToLookup(["target", ...path])}.$errors`, errors);
     }
 
     /**
@@ -197,8 +196,8 @@ namespace Century {
      */
     private prepareTargetRoots(): void {
       for (const [lookup] of this.generateDeconstructedTarget()) {
-        const path = ObjectManagement.lookupToPath(lookup);
-        const root = ObjectManagement.pathToRoot(path);
+        const path = OMPathUtils.lookupToPath(lookup);
+        const root = OMPathUtils.pathToRoot(path);
 
         this.setTargetPathRoot(root, path);
       }
@@ -213,10 +212,10 @@ namespace Century {
      */
     private processTargetErrors(errors: ValidationError[]): void {
       for (const [lookup] of this.generateDeconstructedTarget()) {
-        const path = ObjectManagement.lookupToPath(lookup);
-        const root = ObjectManagement.pathToRoot(path);
+        const path = OMPathUtils.lookupToPath(lookup);
+        const root = OMPathUtils.pathToRoot(path);
 
-        this.assignTargetErrorsForPath(ObjectManagement.getErrorsForRoot(errors, root, true), path);
+        this.assignTargetErrorsForPath(OMPathUtils.getErrorsForRoot(errors, root, true), path);
       }
     }
 
@@ -245,94 +244,34 @@ namespace Century {
      *
      * @returns {[String, Any][]} An Array of the target Object's constituent parts including it's root
      */
-    private generateDeconstructedTarget(): ObjectPart[] {
-      return R.prepend<ObjectPart>(["", this.target], ObjectManagement.walkObjectFor(this.target, Object));
+    private generateDeconstructedTarget(): OMObjectUtils.ObjectPart[] {
+      return R.prepend<OMObjectUtils.ObjectPart>(["", this.target], OMObjectUtils.walkObjectFor(this.target, Object));
     }
 
   }
 
   export namespace ObjectManagement {
 
-    /**
-     * This method breaks down the provided Object into it's constituent parts and returns an Array of Arrays, where
-     * each Subarray contains a lookup string at the zeroth index, and a reference to the value held at that lookup
-     * string in the first index.
-     *
-     * @param {Object} obj - The Object to be deconstructed
-     *
-     * @returns {[String, Any][]} An Array of the Object's constituent parts
-     */
-    export const deconstructObject: <T extends object>(obj: T) => ObjectPart[] = R.compose<any, any, any>(
-      R.chain(([key1, value1]: ObjectPart): any => {
-        if (key1.startsWith("$")) {
-          return [];
-        } else if (typeof value1 === "object") {
-          return [[key1, value1], ...R.map(([key2, value2]) => [`${key1}.${key2}`, value2], deconstructObject(value1))];
-        } else {
-          return [[key1, value1]];
-        }
-      }),
-      R.toPairs
-    );
+    const uuids: string[] = [];
 
     /**
-     * This method will search through the provided Object for values that match the provided type. It will then return
-     * an Array of Arrays, where each Subarray contians a lookup string to the match at the zeroth index, and then a
-     * reference to the match in the first index.
+     * The method will check to see if the UUID provided has been generated on the client, and is there temporary.
      *
-     * @param {Object} obj  - The Object to be searched
-     * @param {Object} type - The type to search for
+     * @param {String} uuid - The unique ID to be checked
      *
-     * @returns {[String, Any][]} An Array of matches found in the Object for the specified type
+     * @returns {Boolean} Whether or not the UUID is temporary
      */
-    export function walkObjectFor<T extends object, U extends Function>(obj: T, type: U): ObjectPart[] {
-      return R.filter<ObjectPart>(R.pipe(R.nth(1), (x) => (x instanceof type)), deconstructObject(obj));
+    export function isTempUUID(uuid: string): boolean {
+      return R.contains(uuid, uuids);
     }
 
     /**
-     * This method will generate a root string from the lookup path provided.
+     * This method will generate a unique ID to act as a placeholder for newly created Strands and Nuggets.
      *
-     * @param {String[]} path - An Array of Object keys forming a lookup path
-     *
-     * @returns {String} A root built from the lookup path provided
+     * @return {String} A unique ID
      */
-    export function pathToRoot(path: string[]): string {
-      return `#/${R.join("/", path)}`;
-    }
-
-    /**
-     * This method will generate a single lookup string from the lookup path provided.
-     *
-     * @param {String[]} path - An Array of Object keys forming a lookup path
-     *
-     * @returns {String} A single lookup string built from the lookup path provided
-     */
-    export function pathToLookup(path: string[]): string {
-      return R.join(".", path);
-    }
-
-    /**
-     * This method will generate an Array of Object keys single from the lookup string provided.
-     *
-     * @param {String[]} lookup - A single lookup string
-     *
-     * @returns {String} An Array of Object keys forming a lookup path
-     */
-    export function lookupToPath(lookup: string): string[] {
-      return R.compose(R.reject<string>(R.isEmpty), R.split("."))(lookup);
-    }
-
-    /**
-     * Retrieve the errors from the Array of errors provided that stem from the "root" provided.
-     *
-     * @param {Object[]} errors    - The Array of validation errors
-     * @param {String}   root      - The root to filter by
-     * @param {Boolean=} recursive - Whether or not the filtered results should be recursively retrieved
-     *
-     * @returns {Object[]} An Array of errors stemming from the root provided
-     */
-    export function getErrorsForRoot<T extends ValidationError>(errors: T[], root: string, recursive?: boolean): T[] {
-      return R.filter<T>(R.propSatisfies(R.test(RegExp(`^${root}${recursive ? "" : "$"}`)), "path"))(errors);
+    export function generateTempUUID(): string {
+      return (uuids[uuids.length] = uuids.length.toString(36));
     }
 
   }
