@@ -41,7 +41,8 @@ namespace Century {
      */
     suite("method: 'walkObjectFor'", (): void => {
       test("should return the expected lookups and values [pass 1]", (): void => {
-        assert.deepEqual(OMObjectUtils.walkObjectFor(mockObj, Object), [
+        assert.deepEqual(OMObjectUtils.walkObjectByValueType(mockObj, Object), [
+          ["", mockObj],
           ["a", mockObj.a],
           ["a.a", mockObj.a.a],
           ["b", mockObj.b],
@@ -49,7 +50,7 @@ namespace Century {
       });
 
       test("should return the expected lookups and values [pass 2]", (): void => {
-        assert.deepEqual(OMObjectUtils.walkObjectFor(mockArr, Object), [
+        assert.deepEqual(OMObjectUtils.walkObjectByValueType(mockArr, Object), [
           ["0", mockArr[0]],
           ["0.a", mockArr[0].a],
           ["0.a.a", mockArr[0].a.a],

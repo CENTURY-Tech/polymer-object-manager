@@ -321,24 +321,6 @@ namespace Century {
         assert((<Sinon.SinonSpy>testComponent.markTargetPathAsInvalid).notCalled);
       });
     });
-
-    /**
-     * Tests for "generateDeconstructedTarget".
-     */
-    suite("method: 'generateDeconstructedTarget'", (): void => {
-      setup((): void => {
-        testComponent.target = R.clone(mockObj);
-      });
-
-      test("should return the required parts of the target Object including the root", (): void => {
-        assert.deepEqual(testComponent.generateDeconstructedTarget(), [
-          ["", testComponent.target],
-          ["a", testComponent.target.a],
-          ["a.a", testComponent.target.a.a],
-          ["b", testComponent.target.b],
-        ]);
-      });
-    });
   });
 
 }

@@ -10,13 +10,32 @@ namespace Century {
     /**
      * This method will determine the changes that have been made to "obj2" that distinguish it from "obj1".
      *
+     * @private
+     *
      * @param {Object} obj1 - The first Object to compare
      * @param {Object} obj2 - The second Object to compare
      *
      * @returns {Object[]} An Array of JSON patches
      */
-    export function generateJSONPatch<T extends object>(obj1: T, obj2: T): fastjsonpatch.Patch[] {
+    function generateJSONPatch<T extends object>(obj1: T, obj2: T): fastjsonpatch.Patch[] {
       return R.reject<fastjsonpatch.Patch>(R.compose(R.test(/\/\$/), R.prop("path")), jsonpatch.compare(obj1, obj2));
+    }
+
+    /**
+     * This method will apply the supplied Array of JSON patches to the target Object provided.
+     *
+     * @private
+     *
+     * @param {Object}   target  - The target Object against which the patches should be applied
+     * @param {Object[]} patches - The Array of JSON patches to apply to the target
+     *
+     * @returns {Object} The original target reference
+     */
+    function applyJSONPatch<T extends object>(target: T, patches: fastjsonpatch.Patch[]): T {
+      // Note that the jsonpatch library applies patches via reference.
+      jsonpatch.apply(target, patches);
+
+      return target;
     }
 
     /**
@@ -32,36 +51,24 @@ namespace Century {
     }
 
     /**
-     * This method will apply the supplied Array of JSON patches to the target Object provided.
+     * This method will determine a list of insertions in the simplest way possible, however, the number of insertions
+     * is not the smallest number, as the list of actions can be N+1 in length, where N = Array.length (the smallest
+     * number of insertions would be N-1).
      *
-     * @param {Object}   target  - The target Object against which the patches should be applied
-     * @param {Object[]} patches - The Array of JSON patches to apply to the target
+     * @param {String} prop - The property to inspect by
+     * @param {Object} arr1 - The first Array to inspect
+     * @param {Object} arr2 - The second Array to inspect
      *
-     * @returns {Object} The original target reference
+     * @returns {Array} An ordered Array of insertions
      */
-    export function applyJSONPatch<T extends object>(target: T, patches: fastjsonpatch.Patch[]): T {
-      // Note that the jsonpatch library applies patches via reference.
-      jsonpatch.apply(target, patches);
-
-      return target;
-    }
-
-    /**
-     * This method will generate an ordered list of actions to be performed against the Array, such that "arr1" will be
-     * reordered to match the order of "arr2".
-     *
-     * @param {String[]} arr1 - The starting Array
-     * @param {String[]} arr2 - The ending Array
-     *
-     * @returns {Object[]} An Array of reordering steps
-     */
-    export function generateArrayPatch(arr1: string[], arr2: string[]): ArrayPatch[] {
+    export function generateArraySortByProp(prop: string, arr1: any[], arr2: any[]): ArrayPatch[] {
       const patch: ArrayPatch[] = [];
       const tracker = Array.from(arr1);
+      const order = R.map(R.prop(prop), arr2);
 
       for (let i = 0; i < arr1.length + 1; i++) {
         const largestMove = tracker.reduce((acc: number[], val: string, index: number): number[] => {
-          const currentMove = [index, arr2.indexOf(val)];
+          const currentMove = [index, order.indexOf(R.prop(prop, val))];
 
           if (Math.abs(currentMove[0] - currentMove[1]) > Math.abs(acc[0] - acc[1])) {
             return currentMove;
@@ -82,21 +89,29 @@ namespace Century {
     }
 
     /**
-     * @todo Document this.
+     * This method will extract an Array of items that only appear in the first liArrayst.
      *
-     * @param {String} prop - The property to use for comparison
-     * @param {Any[]}  arr1 - The primary array to use as the source
-     * @param {Any[]}  arr2 - The secondary array to use as the comparison
+     * @param {String} prop - The property to inspect by
+     * @param {Object} arr1 - The first Array to inspect
+     * @param {Object} arr2 - The second Array to inspect
+     *
+     * @returns {Array} An Array of items that only appear in the first Array
      */
-    export function extractDeviantsByProp<T extends object>(prop: string, arr1: T[], arr2: T[]): T[] {
-      return R.differenceWith<T>(R.eqBy(R.prop(prop)), arr1, arr2);
+    export function extractDeviantsByProp<T>(prop: string, arr1: T[], arr2: T[]): T[] {
+      return R.differenceWith<T>((val1, val2) => R.prop(prop, val1) === R.prop(prop, val2), arr1, arr2);
     }
 
     /**
-     * @todo Document this.
+     * This method will extract an Array of items from the first Array that also appear in the second Array.
+     *
+     * @param {String} prop - The property to inspect by
+     * @param {Object} arr1 - The first Array to inspect
+     * @param {Object} arr2 - The second Array to inspect
+     *
+     * @returns {Array} An Array of items from the first Array that also appear in the second Array
      */
-    export function extractIntersectionsByProp<T extends object>(prop: string, arr1: T[], arr2: T[]): T[] {
-      return R.filter<T>(R.compose(R.flip(R.contains)(R.map(R.prop(prop), arr2)), R.prop(prop)), arr1);
+    export function extractIntersectionsByProp<T>(prop: string, arr1: T[], arr2: T[]): T[] {
+      return R.filter<T>(R.compose<any, any, any>(R.flip(R.contains)(R.map(R.prop(prop), arr2)), R.prop(prop)), arr1);
     }
 
   }

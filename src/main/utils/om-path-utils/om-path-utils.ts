@@ -27,9 +27,20 @@ namespace Century {
     }
 
     /**
-     * This method will generate an Array of Object keys single from the lookup string provided.
+     * This method will generate an Array of Object keys from the root string provided.
      *
-     * @param {String[]} lookup - A single lookup string
+     * @param {String} root - A single root string
+     *
+     * @returns {String} An Array of Object keys forming a lookup path
+     */
+    export function rootToPath(root: string): string[] {
+      return R.compose(R.reject<string>(R.isEmpty), R.tail, R.split("/"))(root);
+    }
+
+    /**
+     * This method will generate an Array of Object keys from the lookup string provided.
+     *
+     * @param {String} lookup - A single lookup string
      *
      * @returns {String} An Array of Object keys forming a lookup path
      */

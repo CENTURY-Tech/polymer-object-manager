@@ -15,7 +15,7 @@ namespace Century {
   /**
    * A mock Object to optionally be used as the target Object for the Object Manager behaviour.
    */
-  export const mockObj = window["mockObj"] = {
+  export const mockObj = {
     a: { a: { a: "foo" }, b: "foo" },
     b: { a: "foo" },
     c: "foo",
@@ -24,7 +24,7 @@ namespace Century {
   /**
    * A mock Array to test the static Object Manager methods in extraneous circumstances.
    */
-  export const mockArr: any[] = window["mockArr"] = [
+  export const mockArr: any[] = [
     { a: { a: { a: "foo" }, b: "foo" } },
     { b: { a: "foo" } },
     { c: "foo" },
@@ -33,7 +33,7 @@ namespace Century {
   /**
    * An Array of mock validation Errors.
    */
-  export const mockErrors: any[] = window["mockErrors"] = [
+  export const mockErrors: any[] = [
     { path: "#/" },
     { path: "#/a" },
     { path: "#/b" },
