@@ -77,19 +77,15 @@ namespace Century {
           original: this.original
         });
 
-        const extractDeviants = R.curry(OMDiffUtils.extractDeviantsByProp)(sortHandler.itemSignature);
-        const generateArraySort = R.curry(OMDiffUtils.generateArraySortByProp)(sortHandler.itemSignature);
-        const extractIntersections = R.curry(OMDiffUtils.extractIntersectionsByProp)(sortHandler.itemSignature);
-
         /**
          * Added lists are Arrays that have been added to the target Object, and therefore have no common parent within
          * the original Object.
          *
          * Added lists can only emit the following event: "inherited-addition"
          */
-        for (const addedList of OMHandlerUtils.retrieveAddedLists(sortHandler, searchResults)) {
-          for (const inheritedAddition of addedList.target[1]) {
-            await sortHandler.handler("inherited-addition", addedList.target[0], inheritedAddition);
+        for (const { target } of OMHandlerUtils.retrieveAddedLists(sortHandler, searchResults)) {
+          for (const inheritedAddition of target[1]) {
+            await sortHandler.handler("inherited-addition", target[0], inheritedAddition);
           }
         }
 
@@ -99,20 +95,24 @@ namespace Century {
          *
          * Shared lists can emit any of the following events: "removal", "move", and "addition".
          */
-        for (const sharedList of OMHandlerUtils.retrieveSharedLists(sortHandler, searchResults)) {
-          for (const removal of extractDeviants(sharedList.original[1], sharedList.target[1])) {
-            await sortHandler.handler("removal", sharedList.target[0], removal);
+        for (const { target, original } of OMHandlerUtils.retrieveSharedLists(sortHandler, searchResults)) {
+          const extractDeviants = R.curry(OMDiffUtils.extractDeviantsByProp)(sortHandler.itemSignature);
+          const generateArraySort = R.curry(OMDiffUtils.generateArraySortByProp)(sortHandler.itemSignature);
+          const extractIntersections = R.curry(OMDiffUtils.extractIntersectionsByProp)(sortHandler.itemSignature);
+
+          for (const removal of extractDeviants(original[1], target[1])) {
+            await sortHandler.handler("removal", target[0], removal);
           }
 
           for (const move of generateArraySort(
-            extractIntersections(sharedList.original[1], sharedList.target[1]),
-            extractIntersections(sharedList.target[1], sharedList.original[1])
+            extractIntersections(original[1], target[1]),
+            extractIntersections(target[1], original[1])
           )) {
-            await sortHandler.handler("move", sharedList.target[0], move);
+            await sortHandler.handler("move", target[0], move);
           }
 
-          for (const addition of extractDeviants(sharedList.target[1], sharedList.original[1])) {
-            await sortHandler.handler("addition", sharedList.target[0], addition);
+          for (const addition of extractDeviants(target[1], original[1])) {
+            await sortHandler.handler("addition", target[0], addition);
           }
         }
 
@@ -122,9 +122,9 @@ namespace Century {
          *
          * Removed lists can only emit the following event: "inherited-removal"
          */
-        for (const removedList of OMHandlerUtils.retrieveRemovedLists(sortHandler, searchResults)) {
-          for (const inheritedRemoval of removedList.original[1]) {
-            await sortHandler.handler("inherited-removal", removedList.original[0], inheritedRemoval);
+        for (const { original } of OMHandlerUtils.retrieveRemovedLists(sortHandler, searchResults)) {
+          for (const inheritedRemoval of original[1]) {
+            await sortHandler.handler("inherited-removal", original[0], inheritedRemoval);
           }
         }
       }
