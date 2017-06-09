@@ -66,136 +66,12 @@ namespace Century {
      * @returns {Promise<Void>}
      */
     public async persistChanges(): Promise<void> {
-      // this.set("target", {
-      //   _id: "957e3ae2-d8e5-4bb8-95c6-9d0e4c1da35e",
-      //   name: "Iain's course 👨🏼‍💻",
-      //   organisation: "4af9f952-4d5f-4cff-9fce-0f1163c138b9",
-      //   description: "😳 🍮 🍔",
-      //   history: {
-      //     firstVersion: {
-      //       createdAt: "2016-12-01T12:00:15.918Z",
-      //       createdBy: "3692f1a9-038b-461c-a2bb-52d95097a91c",
-      //     },
-      //     thisVersion: {
-      //       isDeprecated: false,
-      //       version: 237,
-      //       prevId: "5ba24732-022e-49d4-b180-8860c7a04cfa",
-      //       updatedAt: "2017-06-05T16:32:54.545Z",
-      //       updatedBy: "3692f1a9-038b-461c-a2bb-52d95097a91c",
-      //     },
-      //   },
-      //   isPublished: true,
-      //   isEnabled: true,
-      //   isTest: false,
-      //   isPublic: false,
-      //   labels: [
-      //     {
-      //       _id: "03d06410-e23f-41bd-a661-878d5a2ee9ea",
-      //       name: "⌨",
-      //       colour: "#c153fc",
-      //     },
-      //     {
-      //       _id: "201b02ba-33f2-45ff-991b-09497da78277",
-      //       name: "🤡",
-      //       colour: "#9bf291",
-      //     }
-      //   ],
-      //   strands: [
-      //     {
-      //       name: "Emoji time 🍕",
-      //       nuggets: [
-      //         {
-      //           _id: "ec966293-c864-47e9-ac28-186dd163fa2f",
-      //           name: "🍗",
-      //           isPublished: false,
-      //           isPublic: false,
-      //           prerequisites: [
-      //             "57605ba5-82f4-4fdf-a2f5-364d64815492"
-      //           ],
-      //         },
-      //         {
-      //           _id: "57605ba5-82f4-4fdf-a2f5-364d64815492",
-      //           name: "🐔",
-      //           isPublished: false,
-      //           isPublic: false,
-      //           prerequisites: [],
-      //         },
-      //         {
-      //           _id: "ad7a20a3-84b3-42f7-9132-50b2682a1ee6",
-      //           name: "🥔",
-      //           isPublished: false,
-      //           isPublic: false,
-      //           prerequisites: [],
-      //         }
-      //       ],
-      //       weight: 0,
-      //       id: "c380ceae-143b-4967-9520-15dd2fc09831",
-      //     },
-      //     {
-      //       name: "New strand",
-      //       nuggets: [
-      //         {
-      //           _id: "14b25287-8fe4-4d5b-a4f3-60d4ca92f685",
-      //           name: "1",
-      //           isPublished: false,
-      //           isPublic: false,
-      //           prerequisites: [],
-      //         },
-      //         {
-      //           _id: "c3f62bbb-a708-450e-8843-9c3b15daf375",
-      //           name: "2",
-      //           isPublished: false,
-      //           isPublic: false,
-      //           prerequisites: [],
-      //         },
-      //         {
-      //           _id: "fcfe22c3-d22e-40ae-9e76-24d6bd60e973",
-      //           name: "3",
-      //           isPublished: false,
-      //           isPublic: false,
-      //           prerequisites: [],
-      //         },
-      //         {
-      //           _id: "1794fb5d-045a-428e-9900-0744d6f37050",
-      //           name: "4",
-      //           isPublished: false,
-      //           isPublic: false,
-      //           prerequisites: [],
-      //         },
-      //         {
-      //           _id: "232f6861-0874-4ba4-9d51-95666104c6d9",
-      //           name: "5",
-      //           isPublished: false,
-      //           isPublic: false,
-      //           prerequisites: [],
-      //         },
-      //         {
-      //           _id: "cecc0918-7150-472b-a50c-07fcf0f877e1",
-      //           name: "6",
-      //           isPublished: false,
-      //           isPublic: false,
-      //           prerequisites: [],
-      //         }
-      //       ],
-      //       weight: 0,
-      //       id: "adb407a6-f471-4931-813b-9184655b1784",
-      //     }
-      //   ],
-      //   type: "standard",
-      //   __v: 224,
-      //   level: {
-      //     _id: "923e1b3d-8452-4e98-8b90-685da32a596b",
-      //     name: "A Level",
-      //     colour: "",
-      //   },
-      //   subject: {
-      //     _id: "d2fb0442-7ad3-4ac8-9b08-86bd3efa5aab",
-      //     name: "Mathematics",
-      //     colour: "",
-      //   },
-      // });
-
       for (const sortHandler of this.sortHandlers || []) {
+        // Skip the handler if it has been flagged as invalid
+        if (sortHandler.invalid) {
+          continue;
+        }
+
         const searchResults = OMHandlerUtils.getSearchObject(sortHandler, {
           target: this.target,
           original: this.original
@@ -213,7 +89,7 @@ namespace Century {
          */
         for (const addedList of OMHandlerUtils.retrieveAddedLists(sortHandler, searchResults)) {
           for (const inheritedAddition of addedList.target[1]) {
-            console.log("inherited-addition", addedList.target[0], inheritedAddition);
+            await sortHandler.handler("inherited-addition", addedList.target[0], inheritedAddition);
           }
         }
 
@@ -225,18 +101,18 @@ namespace Century {
          */
         for (const sharedList of OMHandlerUtils.retrieveSharedLists(sortHandler, searchResults)) {
           for (const removal of extractDeviants(sharedList.original[1], sharedList.target[1])) {
-            console.log("removal", sharedList.target[0], removal);
+            await sortHandler.handler("removal", sharedList.target[0], removal);
           }
 
           for (const move of generateArraySort(
             extractIntersections(sharedList.original[1], sharedList.target[1]),
             extractIntersections(sharedList.target[1], sharedList.original[1])
           )) {
-            console.log("move", sharedList.target[0], move);
+            await sortHandler.handler("move", sharedList.target[0], move);
           }
 
           for (const addition of extractDeviants(sharedList.target[1], sharedList.original[1])) {
-            console.log("addition", sharedList.target[0], addition);
+            await sortHandler.handler("addition", sharedList.target[0], addition);
           }
         }
 
@@ -248,12 +124,17 @@ namespace Century {
          */
         for (const removedList of OMHandlerUtils.retrieveRemovedLists(sortHandler, searchResults)) {
           for (const inheritedRemoval of removedList.original[1]) {
-            console.log("inherited-removal", removedList.original[0], inheritedRemoval);
+            await sortHandler.handler("inherited-removal", removedList.original[0], inheritedRemoval);
           }
         }
       }
 
       for (const mergeHandler of this.mergeHandlers || []) {
+        // Skip the handler if it has been flagged as invalid
+        if (mergeHandler.invalid) {
+          continue;
+        }
+
         const searchResults = OMHandlerUtils.getSearchObject(mergeHandler, {
           target: this.target,
           original: this.original
@@ -271,7 +152,7 @@ namespace Century {
           );
 
           if (!R.isEmpty(<any>merge)) {
-            console.log("update", sharedObject.target[0], merge);
+            await mergeHandler.handler("update", sharedObject.target[0], merge);
           }
         }
       }
@@ -328,14 +209,50 @@ namespace Century {
       return this.validateChanges();
     }
 
-    @observe("sortHandlers")
-    public handleSortHandersAssigned(sortHandlers: OMHandlerUtils.SortHandler[]): void {
-      // VALIDATE HANDLERS
+    /**
+     * This method will validate each of the sort handlers, and in the event that a handler is seen to be incorrectly
+     * setup for the current target Object, it will be marked as invalid.
+     *
+     * @param {Object[]} sortHandlers - An Array of sort handlers
+     * @param {Object}   target       - The target Object
+     *
+     * @returns {Void}
+     */
+    @observe("sortHandlers, target")
+    public handleSortHandersAssigned(sortHandlers: OMHandlerUtils.SortHandler[], target: T): void {
+      for (const sortHandler of sortHandlers) {
+        const searchLitmus = OMObjectUtils.walkObjectByLookupRegex(target, sortHandler.search);
+
+        if (searchLitmus.some((objectPart) => objectPart[1].constructor !== Array)) {
+          console.warn("Expected all search results to be Arrays, please refine the search Regex: ", sortHandler);
+
+          // Flag the handler as invalid
+          sortHandler.invalid = true;
+        }
+      }
     }
 
-    @observe("mergeHandlers")
-    public handleMergeHandlersAssigned(mergeHandlers: OMHandlerUtils.MergeHandler[]): void {
-      // VALIDATE HANDLERS
+    /**
+     * This method will validate each of the merge handlers, and in the event that a handler is seen to be incorrectly
+     * setup for the current target Object, it will be marked as invalid.
+     *
+     * @param {Object[]} mergeHandlers - An Array of merge handlers
+     * @param {Object}   target        - The target Object
+     *
+     * @returns {Void}
+     */
+    @observe("mergeHandlers, target")
+    public handleMergeHandlersAssigned(mergeHandlers: OMHandlerUtils.MergeHandler[], target: T): void {
+      for (const mergeHandler of mergeHandlers) {
+        const searchLitmus = OMObjectUtils.walkObjectByLookupRegex(target, mergeHandler.search);
+
+        if (searchLitmus.some((objectPart) => objectPart[1].constructor !== Object)) {
+          console.warn("Expected all search results to be Objects, please refine the search Regex: ", mergeHandler);
+
+          // Flag the handler as invalid
+          mergeHandler.invalid = true;
+        }
+      }
     }
 
     /**

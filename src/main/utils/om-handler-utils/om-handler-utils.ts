@@ -4,10 +4,13 @@ namespace Century {
 
     interface Handler {
       search: RegExp;
+      invalid?: boolean;
       observe?: string[];
       ignore?: string[];
-      handler: (lookup: string, value: any) => any;
+      handler: (action: HandlerEvent, lookup: string, value: any) => Promise<void>;
     }
+
+    export type HandlerEvent = "addition" | "removal" | "move" | "update" | "inherited-addition" | "inherited-removal";
 
     export interface SortHandler extends Handler {
       itemSignature: string;
@@ -23,9 +26,8 @@ namespace Century {
       results: SearchResults;
     };
 
-    export type SearchScope = {[index in "target" | "original"]: any; };
+    export type SearchScope = {[index in "target" | "original"]: object; };
     export type SearchResults = {[index in "target" | "original"]: OMObjectUtils.ObjectPart[]; };
-
     export type MatchedResults = {[index in "target" | "original"]?: OMObjectUtils.ObjectPart};
 
     export function getSearchObject(handler: Handler, scope: SearchScope): SearchObject {
