@@ -18,6 +18,7 @@
     "chai": "4.0.1"
   },
   "resolutions": {
-    "chai": "4.0.1"
+    "chai": "4.0.1",
+    "polymer-ts": "0.1.28"
   }
 }

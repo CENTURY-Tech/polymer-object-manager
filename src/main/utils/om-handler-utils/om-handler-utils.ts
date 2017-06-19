@@ -2,29 +2,29 @@ namespace Century {
 
   export namespace OMHandlerUtils {
 
-    interface Handler {
+    export interface Handler<T = any> {
       search: RegExp;
       invalid?: boolean;
       observe?: string[];
       ignore?: string[];
-      handler: (action: HandlerEvent, lookup: string, value: any) => Promise<void>;
+      handler: (action: HandlerEvent, lookup: string, value: any, metadata: T) => Promise<void>;
     }
 
-    export type HandlerEvent = "addition" | "removal" | "move" | "update" | "inherited-addition" | "inherited-removal";
-
-    export interface SortHandler extends Handler {
+    export interface SortHandler extends Handler<{ targetIndex?: number; originalIndex?: number; }> {
       itemSignature: string;
       parentSignature: string;
     }
 
-    export interface MergeHandler extends Handler {
+    export interface MergeHandler extends Handler<null> {
       objectSignature: string;
     }
+
+    export type HandlerEvent = "addition" | "removal" | "move" | "update" | "inherited-addition" | "inherited-removal";
 
     export interface SearchObject {
       scope: SearchScope;
       results: SearchResults;
-    };
+    }
 
     export type SearchScope = {[index in "target" | "original"]: object; };
     export type SearchResults = {[index in "target" | "original"]: OMObjectUtils.ObjectPart[]; };
@@ -47,7 +47,7 @@ namespace Century {
       };
 
       return { scope, results };
-    };
+    }
 
     /**
      * This method will filter the Object provided according to the keys defined in the handler.
@@ -57,7 +57,7 @@ namespace Century {
      *
      * @returns {Object} A filtered copy of the Object provided
      */
-    export function getRelevantKeys(handler: Handler, value: object): object {
+    export function pickRelevantKeys(handler: Handler, value: object): object {
       value = handler.observe ? R.pick(handler.observe, value) : value;
       value = handler.ignore ? R.omit(handler.ignore, value) : value;
 

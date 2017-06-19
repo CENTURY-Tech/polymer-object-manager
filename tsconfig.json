@@ -5,6 +5,7 @@
     "alwaysStrict": true,
     "skipLibCheck": true,
     "noUnusedLocals": true,
+    "declaration": true,
     "removeComments": true,
     "experimentalDecorators": true
   },

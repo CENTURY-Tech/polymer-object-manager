@@ -5,7 +5,7 @@ namespace Century {
     export interface ArrayPatch {
       value: string;
       toIndex: number;
-    };
+    }
 
     /**
      * This method will determine the changes that have been made to "obj2" that distinguish it from "obj1".
@@ -47,7 +47,7 @@ namespace Century {
      * @returns {Object} A JSON merge Object
      */
     export function generateJSONMerge<T extends object>(obj1: T, obj2: T): T {
-      return applyJSONPatch<T>(<T>{}, generateJSONPatch(obj1, obj2));
+      return applyJSONPatch<T>(Object(), generateJSONPatch(obj1, obj2));
     }
 
     /**
@@ -86,6 +86,10 @@ namespace Century {
       }
 
       return patch;
+    }
+
+    export function findIndexByProp<T>(prop: string, arr: T[], value: T): number {
+      return R.findIndex(R.propEq(prop, R.prop(prop, value)), arr);
     }
 
     /**

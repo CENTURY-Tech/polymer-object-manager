@@ -77,6 +77,8 @@ namespace Century {
           original: this.original
         });
 
+        const findIndex = R.curry<string, any[], any, number>(OMDiffUtils.findIndexByProp)(sortHandler.itemSignature);
+
         /**
          * Added lists are Arrays that have been added to the target Object, and therefore have no common parent within
          * the original Object.
@@ -85,7 +87,9 @@ namespace Century {
          */
         for (const { target } of OMHandlerUtils.retrieveAddedLists(sortHandler, searchResults)) {
           for (const inheritedAddition of target[1]) {
-            await sortHandler.handler("inherited-addition", target[0], inheritedAddition);
+            await sortHandler.handler("inherited-addition", target[0], inheritedAddition, {
+              targetIndex: findIndex(target[1], inheritedAddition)
+            });
           }
         }
 
@@ -101,18 +105,24 @@ namespace Century {
           const extractIntersections = R.curry(OMDiffUtils.extractIntersectionsByProp)(sortHandler.itemSignature);
 
           for (const removal of extractDeviants(original[1], target[1])) {
-            await sortHandler.handler("removal", target[0], removal);
+            await sortHandler.handler("removal", target[0], removal, {
+              originalIndex: findIndex(original[1], removal)
+            });
           }
 
           for (const move of generateArraySort(
             extractIntersections(original[1], target[1]),
             extractIntersections(target[1], original[1])
           )) {
-            await sortHandler.handler("move", target[0], move);
+            await sortHandler.handler("move", target[0], move, {
+              targetIndex: findIndex(target[1], move)
+            });
           }
 
           for (const addition of extractDeviants(target[1], original[1])) {
-            await sortHandler.handler("addition", target[0], addition);
+            await sortHandler.handler("addition", target[0], addition, {
+              targetIndex: findIndex(target[1], addition)
+            });
           }
         }
 
@@ -124,7 +134,9 @@ namespace Century {
          */
         for (const { original } of OMHandlerUtils.retrieveRemovedLists(sortHandler, searchResults)) {
           for (const inheritedRemoval of original[1]) {
-            await sortHandler.handler("inherited-removal", original[0], inheritedRemoval);
+            await sortHandler.handler("inherited-removal", original[0], inheritedRemoval, {
+              originalIndex: findIndex(original[1], inheritedRemoval)
+            });
           }
         }
       }
@@ -147,12 +159,12 @@ namespace Century {
          */
         for (const sharedObject of OMHandlerUtils.retrieveSharedObjects(mergeHandler, searchResults)) {
           const merge = OMDiffUtils.generateJSONMerge(
-            OMHandlerUtils.getRelevantKeys(mergeHandler, sharedObject.original[1]),
-            OMHandlerUtils.getRelevantKeys(mergeHandler, sharedObject.target[1])
+            OMHandlerUtils.pickRelevantKeys(mergeHandler, sharedObject.original[1]),
+            OMHandlerUtils.pickRelevantKeys(mergeHandler, sharedObject.target[1])
           );
 
           if (!R.isEmpty(<any>merge)) {
-            await mergeHandler.handler("update", sharedObject.target[0], merge);
+            await mergeHandler.handler("update", sharedObject.target[0], merge, null);
           }
         }
       }
