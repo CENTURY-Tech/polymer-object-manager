@@ -10,13 +10,23 @@ namespace Century {
       handler: (action: HandlerEvent, lookup: string, value: any, metadata: T) => Promise<void>;
     }
 
-    export interface SortHandler extends Handler<{ targetIndex?: number; originalIndex?: number; }> {
+    export interface SortHandler extends Handler<SortMetadata> {
       itemSignature: string;
       parentSignature: string;
     }
 
-    export interface MergeHandler extends Handler<null> {
+    export interface SortMetadata {
+      targetIndex?: number;
+      originalIndex?: number;
+    }
+
+    export interface MergeHandler extends Handler<MergeMetadata> {
       objectSignature: string;
+    }
+
+    export interface MergeMetadata {
+      targetValue: any;
+      originalValue: any;
     }
 
     export type HandlerEvent = "addition" | "removal" | "move" | "update" | "inherited-addition" | "inherited-removal";

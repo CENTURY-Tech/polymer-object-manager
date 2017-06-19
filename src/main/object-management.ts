@@ -155,7 +155,7 @@ namespace Century {
         /**
          * Shared Objects are Objects that are found in both the target Object and the original Object.
          *
-         * Shared Object can onl emit the following event: "updated".
+         * Shared Object can onl emit the following event: "update".
          */
         for (const sharedObject of OMHandlerUtils.retrieveSharedObjects(mergeHandler, searchResults)) {
           const merge = OMDiffUtils.generateJSONMerge(
@@ -164,7 +164,10 @@ namespace Century {
           );
 
           if (!R.isEmpty(<any>merge)) {
-            await mergeHandler.handler("update", sharedObject.target[0], merge, null);
+            await mergeHandler.handler("update", sharedObject.target[0], merge, {
+              targetValue: sharedObject.target[1],
+              originalValue: sharedObject.original[1]
+            });
           }
         }
       }
