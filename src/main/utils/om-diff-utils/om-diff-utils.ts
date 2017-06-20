@@ -56,8 +56,8 @@ namespace Century {
      * number of insertions would be N-1).
      *
      * @param {String} prop - The property to inspect by
-     * @param {Object} arr1 - The first Array to inspect
-     * @param {Object} arr2 - The second Array to inspect
+     * @param {Array}  arr1 - The first Array to inspect
+     * @param {Array}  arr2 - The second Array to inspect
      *
      * @returns {Array} An ordered Array of insertions
      */
@@ -88,6 +88,16 @@ namespace Century {
       return patch;
     }
 
+    /**
+     * This method will find and return the index of the value in the Array that shares the property value of the
+     * provided key.
+     *
+     * @param {String} prop  - The property to inspect by
+     * @param {Array}  arr   - The Array to inspect
+     * @param {Object} value - The value to search for
+     *
+     * @returns {Number} The index of the Object provided in the Array provided
+     */
     export function findIndexByProp<T>(prop: string, arr: T[], value: T): number {
       return R.findIndex(R.propEq(prop, R.prop(prop, value)), arr);
     }
@@ -96,8 +106,8 @@ namespace Century {
      * This method will extract an Array of items that only appear in the first liArrayst.
      *
      * @param {String} prop - The property to inspect by
-     * @param {Object} arr1 - The first Array to inspect
-     * @param {Object} arr2 - The second Array to inspect
+     * @param {Array}  arr1 - The first Array to inspect
+     * @param {Array}  arr2 - The second Array to inspect
      *
      * @returns {Array} An Array of items that only appear in the first Array
      */
@@ -109,8 +119,8 @@ namespace Century {
      * This method will extract an Array of items from the first Array that also appear in the second Array.
      *
      * @param {String} prop - The property to inspect by
-     * @param {Object} arr1 - The first Array to inspect
-     * @param {Object} arr2 - The second Array to inspect
+     * @param {Array}  arr1 - The first Array to inspect
+     * @param {Array}  arr2 - The second Array to inspect
      *
      * @returns {Array} An Array of items from the first Array that also appear in the second Array
      */
