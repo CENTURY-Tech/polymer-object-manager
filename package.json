@@ -1,6 +1,6 @@
 {
   "name": "ct-object-management",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "scripts": {
     "prebuild:main": "npm run clean:build-main",
     "prebuild:test": "npm run clean:build-test",
