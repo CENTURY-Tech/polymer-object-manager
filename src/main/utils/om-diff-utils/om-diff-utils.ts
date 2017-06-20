@@ -3,7 +3,7 @@ namespace Century {
   export namespace OMDiffUtils {
 
     export interface ArrayPatch {
-      value: string;
+      ref: any;
       toIndex: number;
     }
 
@@ -81,7 +81,7 @@ namespace Century {
           break;
         }
 
-        patch.push({ value: tracker[largestMove[0]], toIndex: largestMove[1] });
+        patch.push({ ref: tracker[largestMove[0]], toIndex: largestMove[1] });
         tracker.splice(largestMove[1], 0, tracker.splice(largestMove[0], 1)[0]);
       }
 

@@ -16,8 +16,9 @@ namespace Century {
     }
 
     export interface SortMetadata {
-      targetIndex?: number;
-      originalIndex?: number;
+      ref: any;
+      toIndex?: number;
+      fromIndex?: number;
     }
 
     export interface MergeHandler extends Handler<MergeMetadata> {
@@ -25,8 +26,8 @@ namespace Century {
     }
 
     export interface MergeMetadata {
-      targetValue: any;
-      originalValue: any;
+      targetRef: any;
+      originalRef: any;
     }
 
     export type HandlerEvent = "addition" | "removal" | "move" | "update" | "inherited-addition" | "inherited-removal";
@@ -147,13 +148,13 @@ namespace Century {
 
       for (const target of searchObject.results.target) {
         const targetPath = OMPathUtils.lookupToPath(target[0]);
-        const targetItem = R.path(targetPath, searchObject.scope.target);
+        const targetObject = R.path(targetPath, searchObject.scope.target);
 
         for (const original of searchObject.results.original) {
           const originalPath = OMPathUtils.lookupToPath(original[0]);
-          const originaItem = R.path(originalPath, searchObject.scope.original);
+          const originalObject = R.path(originalPath, searchObject.scope.original);
 
-          if (originaItem[handler.objectSignature] === targetItem[handler.objectSignature]) {
+          if (originalObject[handler.objectSignature] === targetObject[handler.objectSignature]) {
             matchedResults.push({ target, original });
             break;
           }

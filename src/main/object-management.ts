@@ -77,7 +77,8 @@ namespace Century {
           original: this.original
         });
 
-        const findIndex = R.curry<string, any[], any, number>(OMDiffUtils.findIndexByProp)(sortHandler.itemSignature);
+        const pickKeys = R.curry(OMHandlerUtils.pickRelevantKeys)(sortHandler);
+        const findIndex = R.curry(OMDiffUtils.findIndexByProp)(sortHandler.itemSignature);
 
         /**
          * Added lists are Arrays that have been added to the target Object, and therefore have no common parent within
@@ -87,8 +88,9 @@ namespace Century {
          */
         for (const { target } of OMHandlerUtils.retrieveAddedLists(sortHandler, searchResults)) {
           for (const inheritedAddition of target[1]) {
-            await sortHandler.handler("inherited-addition", target[0], inheritedAddition, {
-              targetIndex: findIndex(target[1], inheritedAddition)
+            await sortHandler.handler("inherited-addition", target[0], pickKeys(inheritedAddition), {
+              ref: inheritedAddition,
+              toIndex: findIndex(target[1], inheritedAddition)
             });
           }
         }
@@ -105,8 +107,9 @@ namespace Century {
           const extractIntersections = R.curry(OMDiffUtils.extractIntersectionsByProp)(sortHandler.itemSignature);
 
           for (const removal of extractDeviants(original[1], target[1])) {
-            await sortHandler.handler("removal", target[0], removal, {
-              originalIndex: findIndex(original[1], removal)
+            await sortHandler.handler("removal", target[0], pickKeys(removal), {
+              ref: removal,
+              fromIndex: findIndex(original[1], removal)
             });
           }
 
@@ -114,14 +117,13 @@ namespace Century {
             extractIntersections(original[1], target[1]),
             extractIntersections(target[1], original[1])
           )) {
-            await sortHandler.handler("move", target[0], move, {
-              targetIndex: findIndex(target[1], move)
-            });
+            await sortHandler.handler("move", target[0], pickKeys(move.ref), move);
           }
 
           for (const addition of extractDeviants(target[1], original[1])) {
-            await sortHandler.handler("addition", target[0], addition, {
-              targetIndex: findIndex(target[1], addition)
+            await sortHandler.handler("addition", target[0], pickKeys(addition), {
+              ref: addition,
+              toIndex: findIndex(target[1], addition)
             });
           }
         }
@@ -134,8 +136,9 @@ namespace Century {
          */
         for (const { original } of OMHandlerUtils.retrieveRemovedLists(sortHandler, searchResults)) {
           for (const inheritedRemoval of original[1]) {
-            await sortHandler.handler("inherited-removal", original[0], inheritedRemoval, {
-              originalIndex: findIndex(original[1], inheritedRemoval)
+            await sortHandler.handler("inherited-removal", original[0], pickKeys(inheritedRemoval), {
+              ref: inheritedRemoval,
+              fromIndex: findIndex(original[1], inheritedRemoval)
             });
           }
         }
@@ -152,6 +155,8 @@ namespace Century {
           original: this.original
         });
 
+        const pickKeys = R.curry(OMHandlerUtils.pickRelevantKeys)(mergeHandler);
+
         /**
          * Shared Objects are Objects that are found in both the target Object and the original Object.
          *
@@ -159,18 +164,20 @@ namespace Century {
          */
         for (const sharedObject of OMHandlerUtils.retrieveSharedObjects(mergeHandler, searchResults)) {
           const merge = OMDiffUtils.generateJSONMerge(
-            OMHandlerUtils.pickRelevantKeys(mergeHandler, sharedObject.original[1]),
-            OMHandlerUtils.pickRelevantKeys(mergeHandler, sharedObject.target[1])
+            pickKeys(sharedObject.original[1]),
+            pickKeys(sharedObject.target[1])
           );
 
           if (!R.isEmpty(<any>merge)) {
             await mergeHandler.handler("update", sharedObject.target[0], merge, {
-              targetValue: sharedObject.target[1],
-              originalValue: sharedObject.original[1]
+              targetRef: sharedObject.target[1],
+              originalRef: sharedObject.original[1]
             });
           }
         }
       }
+
+      this.handleTargetUpdated({ base: this.target, path: "target" });
     }
 
     /**
