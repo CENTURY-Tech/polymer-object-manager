@@ -1,11 +1,17 @@
 namespace Century {
 
+  /**
+   * @namespace Century.OMPathUtils
+   */
   export namespace OMPathUtils {
 
     export type ValidationError = ZSchema.SchemaErrorDetail;
 
     /**
      * This method will generate a root string from the lookup path provided.
+     *
+     * @memberof Century.OMPathUtils
+     * @function pathToRoot
      *
      * @param {String[]} path - An Array of Object keys forming a lookup path
      *
@@ -18,6 +24,9 @@ namespace Century {
     /**
      * This method will generate a single lookup string from the lookup path provided.
      *
+     * @memberof Century.OMPathUtils
+     * @function pathToLookup
+     *
      * @param {String[]} path - An Array of Object keys forming a lookup path
      *
      * @returns {String} A single lookup string built from the lookup path provided
@@ -28,6 +37,9 @@ namespace Century {
 
     /**
      * This method will generate an Array of Object keys from the root string provided.
+     *
+     * @memberof Century.OMPathUtils
+     * @function rootToPath
      *
      * @param {String} root - A single root string
      *
@@ -40,6 +52,9 @@ namespace Century {
     /**
      * This method will generate an Array of Object keys from the lookup string provided.
      *
+     * @memberof Century.OMPathUtils
+     * @function lookupToPath
+     *
      * @param {String} lookup - A single lookup string
      *
      * @returns {String} An Array of Object keys forming a lookup path
@@ -50,6 +65,9 @@ namespace Century {
 
     /**
      * Retrieve the errors from the Array of errors provided that stem from the "root" provided.
+     *
+     * @memberof Century.OMPathUtils
+     * @function getErrorsForRoot
      *
      * @param {Object[]} errors    - The Array of validation errors
      * @param {String}   root      - The root to filter by

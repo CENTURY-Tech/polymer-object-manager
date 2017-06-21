@@ -1,7 +1,20 @@
 namespace Century {
 
+  /**
+   * @namespace Century.OMObjectUtils
+   */
   export namespace OMObjectUtils {
 
+    /**
+     * A mixed Array containing values at the zeroth and first indexes. The zeroth index contains a lookup path to a
+     * value in the targeted Object, and the first index contains a reference to that value, unless the value is neither
+     * an Object nor Array, when it would therefore be a value.
+     *
+     * @memberof Century.OMObjectUtils
+     * @typedef ObjectPart
+     *
+     * @type {Array}
+     */
     export type ObjectPart = [string, any];
 
     /**
@@ -9,9 +22,12 @@ namespace Century {
      * each Subarray contains a lookup string at the zeroth index, and a reference to the value held at that lookup
      * string in the first index.
      *
+     * @memberof Century.OMObjectUtils
+     * @function deconstructObject
+     *
      * @param {Object} obj - The Object to be deconstructed
      *
-     * @returns {[String, Any][]} An Array of the Object's constituent parts
+     * @returns {ObjectPart[]} An Array of the Object's constituent parts
      */
     export const deconstructObject: <T extends object>(obj: T) => ObjectPart[] = R.compose<any, any, any>(
       R.chain(([key1, value1]: ObjectPart): any => {
@@ -31,10 +47,13 @@ namespace Century {
      * return an Array of Arrays, where each Subarray contians a lookup string to the match at the zeroth index, and
      * then a reference to the match in the first index.
      *
+     * @memberof Century.OMObjectUtils
+     * @function walkObjectBy
+     *
      * @param {Object}   obj       - The Object to be searched
      * @param {Function} condition - A condition to be met to be included in the output
      *
-     * @returns {[String, Any][]} An Array of matches found in the Object that satisfy the provided condition
+     * @returns {ObjectPart[]} An Array of matches found in the Object that satisfy the provided condition
      */
     export function walkObjectBy<T extends object>(obj: T, condition: (ObjectPart) => boolean): ObjectPart[] {
       return R.filter<ObjectPart>(condition)([["", obj], ...deconstructObject(obj)]);
@@ -45,10 +64,13 @@ namespace Century {
      * an Array of Arrays, where each Subarray contians a lookup string to the match at the zeroth index, and then a
      * reference to the match in the first index.
      *
+     * @memberof Century.OMObjectUtils
+     * @function walkObjectByValueType
+     *
      * @param {Object} obj  - The Object to be searched
      * @param {Object} type - The type to search for
      *
-     * @returns {[String, Any][]} An Array of matches found in the Object for the specified type
+     * @returns {ObjectPart[]} An Array of matches found in the Object for the specified type
      */
     export function walkObjectByValueType<T extends object>(obj: T, type: Function): ObjectPart[] {
       return walkObjectBy<T>(obj, ([, value]) => value && value.constructor === type);
@@ -59,10 +81,13 @@ namespace Century {
      * will then return an Array of Arrays, where each Subarray contians a lookup string to the match at the zeroth
      * index, and then a reference to the match in the first index.
      *
+     * @memberof Century.OMObjectUtils
+     * @function walkObjectByLookupRegex
+     *
      * @param {Object} obj   - The Object to be searched
      * @param {RegExp} regex - The Regular Expression to search by
      *
-     * @returns {[String, Any][]} An Array of matches found in the Object with lookups that pass the Regular Expression
+     * @returns {ObjectPart[]} An Array of matches found in the Object with lookups that pass the Regular Expression
      */
     export function walkObjectByLookupRegex<T extends object>(obj: T, regex: RegExp): ObjectPart[] {
       return walkObjectBy<T>(obj, ([lookup]) => regex.test(lookup));
