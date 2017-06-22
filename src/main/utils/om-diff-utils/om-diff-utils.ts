@@ -13,47 +13,26 @@ namespace Century {
     /**
      * This method will determine the changes that have been made to "obj2" that distinguish it from "obj1".
      *
-     * @private
-     *
-     * @param {Object} obj1 - The first Object to compare
-     * @param {Object} obj2 - The second Object to compare
-     *
-     * @returns {Object[]} An Array of JSON patches
-     */
-    function generateJSONPatch<T extends object>(obj1: T, obj2: T): fastjsonpatch.Patch[] {
-      return R.reject<fastjsonpatch.Patch>(R.compose(R.test(/\/\$/), R.prop("path")), jsonpatch.compare(obj1, obj2));
-    }
-
-    /**
-     * This method will apply the supplied Array of JSON patches to the target Object provided.
-     *
-     * @private
-     *
-     * @param {Object}   target  - The target Object against which the patches should be applied
-     * @param {Object[]} patches - The Array of JSON patches to apply to the target
-     *
-     * @returns {Object} The original target reference
-     */
-    function applyJSONPatch<T extends object>(target: T, patches: fastjsonpatch.Patch[]): T {
-      // Note that the jsonpatch library applies patches via reference.
-      jsonpatch.apply(target, patches);
-
-      return target;
-    }
-
-    /**
-     * This method will determine the changes that have been made to "obj2" that distinguish it from "obj1".
-     *
      * @memberof Century.OMDiffUtils
-     * @function generateJSONMerge
+     * @function generateObjectMerge
      *
      * @param {Object} obj1 - The first Object to compare
      * @param {Object} obj2 - The second Object to compare
      *
      * @returns {Object} A JSON merge Object
      */
-    export function generateJSONMerge<T extends object>(obj1: T, obj2: T): T {
-      return applyJSONPatch<T>(Object(), generateJSONPatch(obj1, obj2));
+    export function generateObjectMerge<T extends object>(obj1: T, obj2: T): T {
+      return R.reduce<any, T>((acc, [key, val]) => {
+        if (!R.has(key, obj2)) {
+          acc[key] = null;
+        } else if (!R.equals(val, obj2[key])) {
+          acc[key] = val && val.constructor === Object && obj2[key] && obj2[key].constructor === Object
+            ? generateObjectMerge(val, obj2[key])
+            : obj2[key];
+        }
+
+        return acc;
+      }, R.pick<T, T>(R.difference(R.keys(obj2), R.keys(obj1)), obj2), R.toPairs(obj1));
     }
 
     /**

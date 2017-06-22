@@ -200,7 +200,7 @@ namespace Century {
          * Shared Object can onl emit the following event: "update".
          */
         for (const sharedObject of OMHandlerUtils.retrieveSharedObjects(mergeHandler, searchResults)) {
-          const merge = OMDiffUtils.generateJSONMerge(
+          const merge = OMDiffUtils.generateObjectMerge(
             pickKeys(sharedObject.original[1]),
             pickKeys(sharedObject.target[1])
           );

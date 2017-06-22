@@ -8,7 +8,7 @@
   ],
   "dependencies": {
     "es6-shim": "~0",
-    "js-imports": "~1",
+    "js-imports": "~2",
     "polymer": "1.7.0"
   },
   "devDependencies": {

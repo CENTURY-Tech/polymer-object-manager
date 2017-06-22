@@ -1,7 +1,6 @@
 {
   "name": "ct-object-management",
   "globalDependencies": {
-    "fast-json-patch": "registry:dt/fast-json-patch#1.0.0+20161005184000",
     "ramda": "registry:global/ramda#0.21.0+20160531162943",
     "sinon": "registry:dt/sinon#1.16.1+20161208163514",
     "z-schema": "file:./node_modules/@ctek/typed-utils/.build/z-schema.d.ts"
