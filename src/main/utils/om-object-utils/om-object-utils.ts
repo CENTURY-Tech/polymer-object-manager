@@ -1,19 +1,11 @@
 namespace Century {
 
-  /**
-   * @namespace Century.OMObjectUtils
-   */
   export namespace OMObjectUtils {
 
     /**
      * A mixed Array containing values at the zeroth and first indexes. The zeroth index contains a lookup path to a
      * value in the targeted Object, and the first index contains a reference to that value, unless the value is neither
      * an Object nor Array, when it would therefore be a value.
-     *
-     * @memberof Century.OMObjectUtils
-     * @typedef ObjectPart
-     *
-     * @type {Array}
      */
     export type ObjectPart = [string, any];
 
@@ -21,9 +13,6 @@ namespace Century {
      * This method breaks down the provided Object into it's constituent parts and returns an Array of Arrays, where
      * each Subarray contains a lookup string at the zeroth index, and a reference to the value held at that lookup
      * string in the first index.
-     *
-     * @memberof Century.OMObjectUtils
-     * @function deconstructObject
      *
      * @param {Object} obj - The Object to be deconstructed
      *
@@ -47,9 +36,6 @@ namespace Century {
      * return an Array of Arrays, where each Subarray contians a lookup string to the match at the zeroth index, and
      * then a reference to the match in the first index.
      *
-     * @memberof Century.OMObjectUtils
-     * @function walkObjectBy
-     *
      * @param {Object}   obj       - The Object to be searched
      * @param {Function} condition - A condition to be met to be included in the output
      *
@@ -64,9 +50,6 @@ namespace Century {
      * an Array of Arrays, where each Subarray contians a lookup string to the match at the zeroth index, and then a
      * reference to the match in the first index.
      *
-     * @memberof Century.OMObjectUtils
-     * @function walkObjectByValueType
-     *
      * @param {Object} obj  - The Object to be searched
      * @param {Object} type - The type to search for
      *
@@ -80,9 +63,6 @@ namespace Century {
      * This method will search through the provided Object for lookups that match the provided Regular Expression. It
      * will then return an Array of Arrays, where each Subarray contians a lookup string to the match at the zeroth
      * index, and then a reference to the match in the first index.
-     *
-     * @memberof Century.OMObjectUtils
-     * @function walkObjectByLookupRegex
      *
      * @param {Object} obj   - The Object to be searched
      * @param {RegExp} regex - The Regular Expression to search by

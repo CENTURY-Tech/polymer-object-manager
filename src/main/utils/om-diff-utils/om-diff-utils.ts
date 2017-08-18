@@ -1,8 +1,5 @@
 namespace Century {
 
-  /**
-   * @namespace Century.OMDiffUtils
-   */
   export namespace OMDiffUtils {
 
     export interface ArrayPatch {
@@ -12,9 +9,6 @@ namespace Century {
 
     /**
      * This method will determine the changes that have been made to "obj2" that distinguish it from "obj1".
-     *
-     * @memberof Century.OMDiffUtils
-     * @function generateObjectMerge
      *
      * @param {Object} obj1 - The first Object to compare
      * @param {Object} obj2 - The second Object to compare
@@ -39,9 +33,6 @@ namespace Century {
      * This method will determine a list of insertions in the simplest way possible, however, the number of insertions
      * is not the smallest number, as the list of actions can be N+1 in length, where N = Array.length (the smallest
      * number of insertions would be N-1).
-     *
-     * @memberof Century.OMDiffUtils
-     * @function generateArraySortByProp
      *
      * @param {String} prop - The property to inspect by
      * @param {Array}  arr1 - The first Array to inspect
@@ -80,9 +71,6 @@ namespace Century {
      * This method will find and return the index of the value in the Array that shares the property value of the
      * provided key.
      *
-     * @memberof Century.OMDiffUtils
-     * @function findIndexByProp
-     *
      * @param {String} prop  - The property to inspect by
      * @param {Array}  arr   - The Array to inspect
      * @param {Object} value - The value to search for
@@ -96,9 +84,6 @@ namespace Century {
     /**
      * This method will extract an Array of items that only appear in the first liArrayst.
      *
-     * @memberof Century.OMDiffUtils
-     * @function extractDeviantsByProp
-     *
      * @param {String} prop - The property to inspect by
      * @param {Array}  arr1 - The first Array to inspect
      * @param {Array}  arr2 - The second Array to inspect
@@ -111,9 +96,6 @@ namespace Century {
 
     /**
      * This method will extract an Array of items from the first Array that also appear in the second Array.
-     *
-     * @memberof Century.OMDiffUtils
-     * @function extractIntersectionsByProp
      *
      * @param {String} prop - The property to inspect by
      * @param {Array}  arr1 - The first Array to inspect

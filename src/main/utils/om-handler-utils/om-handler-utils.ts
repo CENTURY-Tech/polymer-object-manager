@@ -1,8 +1,5 @@
 namespace Century {
 
-  /**
-   * @namespace Century.OMHandlerUtils
-   */
   export namespace OMHandlerUtils {
 
     export interface Handler<T = any> {
@@ -49,9 +46,6 @@ namespace Century {
      * satisfy the search expression on the provided handler, and return a search Object containing both the provided
      * scope and the search results. Note that the initial scope is kept for later reference.
      *
-     * @memberof Century.OMHandlerUtils
-     * @function getSearchObject
-     *
      * @param {Object} handler - The handler to be used
      * @param {Object} scope   - The scope of the search
      *
@@ -69,9 +63,6 @@ namespace Century {
     /**
      * This method will filter the Object provided according to the keys defined in the handler.
      *
-     * @memberof Century.OMHandlerUtils
-     * @function pickRelevantKeys
-     *
      * @param {Object} handler - The handler to be used
      * @param {Object} value   - The Object to filter
      *
@@ -87,9 +78,6 @@ namespace Century {
     /**
      * This method will retrieve the Array of Object parts from the search results that exist on the target, but not the
      * original.
-     *
-     * @memberof Century.OMHandlerUtils
-     * @function retrieveAddedLists
      *
      * @param {Object} handler      - The handler to be used
      * @param {Object} searchObject - An Object holding the search scope and search results
@@ -119,9 +107,6 @@ namespace Century {
     /**
      * This method will retrieve the Array of Object parts in the search results that exist on both the target and the
      * original. Note that this method specifically handles sort handlers.
-     *
-     * @memberof Century.OMHandlerUtils
-     * @function retrieveSharedLists
      *
      * @param {Object} handler      - The handler to be used
      * @param {Object} searchObject - An Object holding the search scope and search results
@@ -153,9 +138,6 @@ namespace Century {
      * This method will retrieve the Array of Object parts in the search results that exist on both the target and the
      * original. Note that this method specifically handles merge handlers.
      *
-     * @memberof Century.OMHandlerUtils
-     * @function retrieveSharedObjects
-     *
      * @param {Object} handler      - The handler to be used
      * @param {Object} searchObject - An Object holding the search scope and search results
      *
@@ -185,9 +167,6 @@ namespace Century {
     /**
      * This method will retrieve the Array of Object parts in the search results that do not exist on the target, but do
      * exist on the original.
-     *
-     * @memberof Century.OMHandlerUtils
-     * @function retrieveRemovedLists
      *
      * @param {Object} handler      - The handler to be used
      * @param {Object} searchObject - An Object holding the search scope and search results

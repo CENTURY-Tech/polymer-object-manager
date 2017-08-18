@@ -1,25 +1,15 @@
-/**
- * @namespace Century
- */
 namespace Century {
 
   type ValidationError = ZSchema.SchemaErrorDetail;
 
   /**
    * Object Management behaviour.
-   *
-   * @class Century.ObjectManagement
-   * @extends polymer.Base
    */
   export class ObjectManagement<T extends object> extends polymer.Base {
 
     /**
      * The target Object to be managed. Upon assigning the target, a clone of the target is made and stored privately to
      * allow for use during change detection and resetting later on.
-     *
-     * @memberof Century.ObjectManagement
-     * @var target
-     * @instance
      */
     @property({ type: Object, notify: true })
     public target: T;
@@ -27,10 +17,6 @@ namespace Century {
     /**
      * The schema with which to perform any validation. This must be a valid JSON schema, and is only required to cover
      * keys on the target that need to be validated, any other keys will be ignored.
-     *
-     * @memberof Century.ObjectManagement
-     * @var schema
-     * @instance
      */
     @property({ type: Object })
     public schema: object;
@@ -38,10 +24,6 @@ namespace Century {
     /**
      * An Array of sorting handlers instruct the behaviour how to handle changes in Arrays found within the target
      * Object.
-     *
-     * @memberof Century.ObjectManagement
-     * @var sortHandlers
-     * @instance
      */
     @property({ type: Object })
     public sortHandlers: OMHandlerUtils.SortHandler[];
@@ -49,31 +31,17 @@ namespace Century {
     /**
      * An Array of merge handlers that instruct the behaviour how to handle changes in Objects found within the target
      * Object.
-     *
-     * @memberof Century.ObjectManagement
-     * @var mergeHandlers
-     * @instance
      */
     @property({ type: Object })
     public mergeHandlers: OMHandlerUtils.MergeHandler[];
 
     /**
      * A backup copy of the target.
-     *
-     * @memberof Century.ObjectManagement
-     * @var original
-     * @instance
-     * @private
      */
     private original: T;
 
     /**
      * An instance of the ZSchema class, used for validation purposes.
-     *
-     * @memberof Century.ObjectManagement
-     * @var validator
-     * @instance
-     * @private
      */
     private validator: ZSchema;
 
@@ -81,12 +49,6 @@ namespace Century {
      * This lifecycle method is used as a constructor, as constructors are not called on Behaviours. This limitation
      * prevents us from initialising the required private variables within the declaration of the class properties when
      * transpiling down to ES5. Because Typescript + Polymer = A big bag of fun...
-     *
-     * @memberof Century.ObjectManagement
-     * @function created
-     * @instance
-     *
-     * @returns {Void}
      */
     public created(): void {
       this.validator = new ZSchema({ breakOnFirstError: false });
@@ -95,10 +57,6 @@ namespace Century {
     /**
      * This method calculates the changes made to the target Object, and then parses those changes according handlers
      * that should have previously been assigned, if no handlers are found, then the method will resolve immediately.
-     *
-     * @memberof Century.ObjectManagement
-     * @function persistChanges
-     * @instance
      *
      * @returns {Promise<Void>}
      */
@@ -219,12 +177,6 @@ namespace Century {
 
     /**
      * This method will reset the target Object to it's original state.
-     *
-     * @memberof Century.ObjectManagement
-     * @function resetChanges
-     * @instance
-     *
-     * @returns {Void}
      */
     public resetChanges(): void {
       this.set("target", this.original);
@@ -233,12 +185,6 @@ namespace Century {
     /**
      * This method will validate the target Object against the provided schema, if available. After validating the
      * target Object, any errors generated during the validation process will be processed.
-     *
-     * @memberof Century.ObjectManagement
-     * @function validateChanges
-     * @instance
-     *
-     * @returns {Void}
      */
     public validateChanges(): void {
       if (!this.target || !this.schema || !this.validator) {
@@ -253,13 +199,7 @@ namespace Century {
      * This method will handle any updates made to the target Object. If the Object is being set, a clone will be made
      * and referenced for later usage. If however, Object is being updated, it is marked as dirty, and then validated.
      *
-     * @memberof Century.ObjectManagement
-     * @function handleTargetUpdated
-     * @instance
-     *
      * @param {Object} diff - A Polymer diff Object
-     *
-     * @returns {Void}
      */
     @observe("target.*")
     public handleTargetUpdated(diff: { base: T, path: string }): void | boolean {
@@ -284,14 +224,8 @@ namespace Century {
      * This method will validate each of the sort handlers, and in the event that a handler is seen to be incorrectly
      * setup for the current target Object, it will be marked as invalid.
      *
-     * @memberof Century.ObjectManagement
-     * @function handleSortHandersAssigned
-     * @instance
-     *
      * @param {Object[]} sortHandlers - An Array of sort handlers
      * @param {Object}   target       - The target Object
-     *
-     * @returns {Void}
      */
     @observe("sortHandlers, target")
     public handleSortHandersAssigned(sortHandlers: OMHandlerUtils.SortHandler[], target: T): void {
@@ -311,14 +245,8 @@ namespace Century {
      * This method will validate each of the merge handlers, and in the event that a handler is seen to be incorrectly
      * setup for the current target Object, it will be marked as invalid.
      *
-     * @memberof Century.ObjectManagement
-     * @function handleMergeHandlersAssigned
-     * @instance
-     *
      * @param {Object[]} mergeHandlers - An Array of merge handlers
      * @param {Object}   target        - The target Object
-     *
-     * @returns {Void}
      */
     @observe("mergeHandlers, target")
     public handleMergeHandlersAssigned(mergeHandlers: OMHandlerUtils.MergeHandler[], target: T): void {
@@ -338,14 +266,7 @@ namespace Century {
      * This method will mark the Object at the lookup path provided as pristine (that is untouched). This will falsify
      * the "$dirty" flag at the lookup path specified on the target and make the "$pristine" flag truthy.
      *
-     * @memberof Century.ObjectManagement
-     * @function markTargetPathAsPristine
-     * @instance
-     * @private
-     *
      * @param {String[]} path - An Array of Object keys forming a lookup path
-     *
-     * @returns {Void}
      */
     private markTargetPathAsPristine(path: string[]): void {
       const lookup = OMPathUtils.pathToLookup(["target", ...path]);
@@ -358,14 +279,7 @@ namespace Century {
      * This method will mark the Object at the lookup path provided as as dirty (that it has had changes made). This
      * will falsify the "$pristine" flag at the lookup path specified on the target and make the "$dirty" flag truthy.
      *
-     * @memberof Century.ObjectManagement
-     * @function markTargetPathAsDirty
-     * @instance
-     * @private
-     *
      * @param {String[]} path - An Array of Object keys forming a lookup path
-     *
-     * @returns {Void}
      */
     private markTargetPathAsDirty(path: string[]): void {
       const lookup = OMPathUtils.pathToLookup(["target", ...path]);
@@ -378,14 +292,7 @@ namespace Century {
      * This method will mark the Object at the lookup path provided as valid. This will falsify the "$invalid" flag, and
      * make the "$valid" flag truthy.
      *
-     * @memberof Century.ObjectManagement
-     * @function markTargetPathAsValid
-     * @instance
-     * @private
-     *
      * @param {String[]} path - An Array of Object keys forming a lookup path
-     *
-     * @returns {Void}
      */
     private markTargetPathAsValid(path: string[]): void {
       const lookup = OMPathUtils.pathToLookup(["target", ...path]);
@@ -398,14 +305,7 @@ namespace Century {
      * This method will mark the Object at the lookup path provided as invalid. This will falsify the "$valid" flag, and
      * make the "$invalid" flag truthy.
      *
-     * @memberof Century.ObjectManagement
-     * @function markTargetPathAsInvalid
-     * @instance
-     * @private
-     *
      * @param {String[]} path - An Array of Object keys forming a lookup path
-     *
-     * @returns {Void}
      */
     private markTargetPathAsInvalid(path: string[]): void {
       const lookup = OMPathUtils.pathToLookup(["target", ...path]);
@@ -418,15 +318,8 @@ namespace Century {
      * This method will assign the provided root to a key named "$root" on the target Object at the lookup path
      * provided.
      *
-     * @memberof Century.ObjectManagement
-     * @function setTargetPathRoot
-     * @instance
-     * @private
-     *
      * @param {String}   root - The root to be set at the lookup path provided
      * @param {String[]} path - An Array of Object keys forming a lookup path
-     *
-     * @returns {Void}
      */
     private setTargetPathRoot(root: string, path: string[]): void {
       this.set(`${OMPathUtils.pathToLookup(["target", ...path])}.$root`, root);
@@ -436,15 +329,8 @@ namespace Century {
      * This method will assign the provided errors to a key named "$errors" on the target Object at the lookup path
      * provided.
      *
-     * @memberof Century.ObjectManagement
-     * @function setTargetPathErrors
-     * @instance
-     * @private
-     *
      * @param {Object[]} errors - The errors to be set at the lookup path provided
      * @param {String[]} path   - An Array of Object keys forming a lookup path
-     *
-     * @returns {Void}
      */
     private setTargetPathErrors(errors: ValidationError[], path: string[]): void {
       this.set(`${OMPathUtils.pathToLookup(["target", ...path])}.$errors`, errors);
@@ -452,13 +338,6 @@ namespace Century {
 
     /**
      * This method will initialise the root path for every Object in the target Object.
-     *
-     * @memberof Century.ObjectManagement
-     * @function prepareTargetRoots
-     * @instance
-     * @private
-     *
-     * @returns {Void}
      */
     private prepareTargetRoots(): void {
       for (const [lookup] of OMObjectUtils.walkObjectByValueType(this.target, Object)) {
@@ -472,14 +351,7 @@ namespace Century {
     /**
      * This method will populate the errors provided throughout the target Object.
      *
-     * @memberof Century.ObjectManagement
-     * @function processTargetErrors
-     * @instance
-     * @private
-     *
      * @param {Object[]} errors - The errors to be populated throughout the target Object
-     *
-     * @returns {Void}
      */
     private processTargetErrors(errors: ValidationError[]): void {
       for (const [lookup] of OMObjectUtils.walkObjectByValueType(this.target, Object)) {
@@ -494,15 +366,8 @@ namespace Century {
      * This method will assign the errors provided to the target Object at the lookup path provided, and will then
      * proceed to update the validity signature of the Object at the lookup path provided.
      *
-     * @memberof Century.ObjectManagement
-     * @function assignTargetErrorsForPath
-     * @instance
-     * @private
-     *
      * @param {Object[]} errors - The errors to be populated throughout the target Object
      * @param {String[]} path   - An Array of Object keys forming a lookup path
-     *
-     * @returns {Void}
      */
     private assignTargetErrorsForPath(errors: ValidationError[], path: string[]): void {
       this.setTargetPathErrors(errors, path);
@@ -523,9 +388,6 @@ namespace Century {
     /**
      * The method will check to see if the UUID provided has been generated on the client, and is there temporary.
      *
-     * @memberof Century.ObjectManagement
-     * @function isTempUUID
-     *
      * @param {String} uuid - The unique ID to be checked
      *
      * @returns {Boolean} Whether or not the UUID is temporary
@@ -536,9 +398,6 @@ namespace Century {
 
     /**
      * This method will generate a unique ID to act as a placeholder for newly created Strands and Nuggets.
-     *
-     * @memberof Century.ObjectManagement
-     * @function generateTempUUID
      *
      * @return {String} A unique ID
      */

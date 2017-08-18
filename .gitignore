@@ -13,6 +13,7 @@ package-lock.json
 npm-debug.log
 
 # Build files
-/utils
+/docs
 /test
+/utils
 /object-management.*
