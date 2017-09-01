@@ -1,6 +1,6 @@
 namespace Century {
 
-  export namespace OMObjectUtils {
+  export namespace ObjectUtils {
 
     /**
      * A mixed Array containing values at the zeroth and first indexes. The zeroth index contains a lookup path to a
@@ -41,7 +41,7 @@ namespace Century {
      *
      * @returns {ObjectPart[]} An Array of matches found in the Object that satisfy the provided condition
      */
-    export function walkObjectBy<T extends object>(obj: T, condition: (ObjectPart) => boolean): ObjectPart[] {
+    export function walkObjectBy<T extends object>(obj: T, condition: (x: ObjectPart) => boolean): ObjectPart[] {
       return R.filter<ObjectPart>(condition)([["", obj], ...deconstructObject(obj)]);
     }
 

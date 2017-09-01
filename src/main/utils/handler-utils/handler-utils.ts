@@ -1,6 +1,6 @@
 namespace Century {
 
-  export namespace OMHandlerUtils {
+  export namespace HandlerUtils {
 
     export interface Handler<T = any> {
       search: RegExp;
@@ -38,8 +38,8 @@ namespace Century {
     }
 
     export type SearchScope = {[index in "target" | "original"]: object; };
-    export type SearchResults = {[index in "target" | "original"]: OMObjectUtils.ObjectPart[]; };
-    export type MatchedResults = {[index in "target" | "original"]?: OMObjectUtils.ObjectPart};
+    export type SearchResults = {[index in "target" | "original"]: ObjectUtils.ObjectPart[]; };
+    export type MatchedResults = {[index in "target" | "original"]?: ObjectUtils.ObjectPart};
 
     /**
      * This method will walk the "target" and "original" Objects provided in the search scope for values who's lookups
@@ -53,8 +53,8 @@ namespace Century {
      */
     export function getSearchObject(handler: Handler, scope: SearchScope): SearchObject {
       const results = {
-        target: OMObjectUtils.walkObjectByLookupRegex(scope.target, handler.search),
-        original: OMObjectUtils.walkObjectByLookupRegex(scope.original, handler.search)
+        target: ObjectUtils.walkObjectByLookupRegex(scope.target, handler.search),
+        original: ObjectUtils.walkObjectByLookupRegex(scope.original, handler.search)
       };
 
       return { scope, results };
@@ -88,12 +88,12 @@ namespace Century {
       const matchedResults: MatchedResults[] = [];
 
       for (const target of searchObject.results.target) {
-        const targetPath = OMPathUtils.lookupToPath(target[0]);
-        const targetParent = R.path(R.init(targetPath), searchObject.scope.target);
+        const targetPath = PathUtils.lookupToPath(target[0]);
+        const targetParent = R.path<DiffUtils.UnknownObject>(R.init(targetPath), searchObject.scope.target);
 
         if (searchObject.results.original.every((original) => {
-          const originalPath = OMPathUtils.lookupToPath(original[0]);
-          const originalParent = R.path(R.init(originalPath), searchObject.scope.original);
+          const originalPath = PathUtils.lookupToPath(original[0]);
+          const originalParent = R.path<DiffUtils.UnknownObject>(R.init(originalPath), searchObject.scope.original);
 
           return originalParent[handler.parentSignature] !== targetParent[handler.parentSignature];
         })) {
@@ -117,12 +117,12 @@ namespace Century {
       const matchedResults: MatchedResults[] = [];
 
       for (const target of searchObject.results.target) {
-        const targetPath = OMPathUtils.lookupToPath(target[0]);
-        const targetParent = R.path(R.init(targetPath), searchObject.scope.target);
+        const targetPath = PathUtils.lookupToPath(target[0]);
+        const targetParent = R.path<DiffUtils.UnknownObject>(R.init(targetPath), searchObject.scope.target);
 
         for (const original of searchObject.results.original) {
-          const originalPath = OMPathUtils.lookupToPath(original[0]);
-          const originalParent = R.path(R.init(originalPath), searchObject.scope.original);
+          const originalPath = PathUtils.lookupToPath(original[0]);
+          const originalParent = R.path<DiffUtils.UnknownObject>(R.init(originalPath), searchObject.scope.original);
 
           if (originalParent[handler.parentSignature] === targetParent[handler.parentSignature]) {
             matchedResults.push({ target, original });
@@ -147,12 +147,12 @@ namespace Century {
       const matchedResults: MatchedResults[] = [];
 
       for (const target of searchObject.results.target) {
-        const targetPath = OMPathUtils.lookupToPath(target[0]);
-        const targetObject = R.path(targetPath, searchObject.scope.target);
+        const targetPath = PathUtils.lookupToPath(target[0]);
+        const targetObject = R.path<DiffUtils.UnknownObject>(targetPath, searchObject.scope.target);
 
         for (const original of searchObject.results.original) {
-          const originalPath = OMPathUtils.lookupToPath(original[0]);
-          const originalObject = R.path(originalPath, searchObject.scope.original);
+          const originalPath = PathUtils.lookupToPath(original[0]);
+          const originalObject = R.path<DiffUtils.UnknownObject>(originalPath, searchObject.scope.original);
 
           if (originalObject[handler.objectSignature] === targetObject[handler.objectSignature]) {
             matchedResults.push({ target, original });
@@ -177,12 +177,12 @@ namespace Century {
       const matchedResults: MatchedResults[] = [];
 
       for (const original of searchObject.results.original) {
-        const originalPath = OMPathUtils.lookupToPath(original[0]);
-        const originalParent = R.path(R.init(originalPath), searchObject.scope.original);
+        const originalPath = PathUtils.lookupToPath(original[0]);
+        const originalParent = R.path<DiffUtils.UnknownObject>(R.init(originalPath), searchObject.scope.original);
 
         if (searchObject.results.target.every((target) => {
-          const targetPath = OMPathUtils.lookupToPath(target[0]);
-          const targetParent = R.path(R.init(targetPath), searchObject.scope.target);
+          const targetPath = PathUtils.lookupToPath(target[0]);
+          const targetParent = R.path<DiffUtils.UnknownObject>(R.init(targetPath), searchObject.scope.target);
 
           return targetParent[handler.parentSignature] !== originalParent[handler.parentSignature];
         })) {

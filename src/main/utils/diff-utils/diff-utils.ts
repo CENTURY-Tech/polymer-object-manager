@@ -1,6 +1,10 @@
 namespace Century {
 
-  export namespace OMDiffUtils {
+  export namespace DiffUtils {
+
+    export interface UnknownObject {
+      [x: string]: any;
+    }
 
     export interface ArrayPatch {
       ref: any;
@@ -15,8 +19,8 @@ namespace Century {
      *
      * @returns {Object} A JSON merge Object
      */
-    export function generateObjectMerge<T extends object>(obj1: T, obj2: T): T {
-      return R.reduce<any, T>((acc, [key, val]) => {
+    export function generateObjectMerge<T extends UnknownObject>(obj1: T, obj2: T): T {
+      return R.reduce<any, T>((acc: T, [key, val]: [string, any]) => {
         if (!R.has(key, obj2)) {
           acc[key] = null;
         } else if (!R.equals(val, obj2[key])) {
@@ -26,7 +30,7 @@ namespace Century {
         }
 
         return acc;
-      }, R.pick<T, T>(R.difference(R.keys(obj2), R.keys(obj1)), obj2), R.toPairs(obj1));
+      }, R.pick(R.difference(R.keys(obj2), R.keys(obj1)), obj2) as T, R.toPairs(obj1));
     }
 
     /**
@@ -43,7 +47,7 @@ namespace Century {
     export function generateArraySortByProp(prop: string, arr1: any[], arr2: any[]): ArrayPatch[] {
       const patch: ArrayPatch[] = [];
       const tracker = Array.from(arr1);
-      const order = R.map(R.prop(prop), arr2);
+      const order = R.map(R.prop(prop), arr2) as any[];
 
       for (let i = 0; i < arr1.length + 1; i++) {
         const largestMove = tracker.reduce((acc: number[], val: string, index: number): number[] => {

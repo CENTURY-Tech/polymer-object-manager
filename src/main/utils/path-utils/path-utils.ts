@@ -1,6 +1,6 @@
 namespace Century {
 
-  export namespace OMPathUtils {
+  export namespace PathUtils {
 
     export type ValidationError = ZSchema.SchemaErrorDetail;
 
@@ -34,7 +34,7 @@ namespace Century {
      * @returns {String} An Array of Object keys forming a lookup path
      */
     export function rootToPath(root: string): string[] {
-      return R.compose(R.reject<string>(R.isEmpty), R.tail, R.split("/"))(root);
+      return R.compose(R.reject<string>(R.isEmpty), R.tail as (x: string[]) => string[], R.split("/"))(root);
     }
 
     /**

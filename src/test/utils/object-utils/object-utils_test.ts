@@ -1,15 +1,15 @@
 namespace Century {
 
-  suite("namespace: 'OMObjectUtils'", (): void => {
+  suite("namespace: 'ObjectUtils'", (): void => {
 
-    const OMObjectUtils: any = Century["OMObjectUtils"];
+    const ObjectUtils = (Century as any).ObjectUtils;
 
     /**
      * Tests for "deconstructObject".
      */
     suite("method: 'deconstructObject'", (): void => {
       test("should return the expected lookups and values [pass 1]", (): void => {
-        assert.deepEqual(OMObjectUtils.deconstructObject(mockObj), [
+        assert.deepEqual(ObjectUtils.deconstructObject(mockObj), [
           ["a", mockObj.a],
           ["a.a", mockObj.a.a],
           ["a.a.a", mockObj.a.a.a],
@@ -21,7 +21,7 @@ namespace Century {
       });
 
       test("should return the expected lookups and values [pass 2]", (): void => {
-        assert.deepEqual(OMObjectUtils.deconstructObject(mockArr), [
+        assert.deepEqual(ObjectUtils.deconstructObject(mockArr), [
           ["0", mockArr[0]],
           ["0.a", mockArr[0].a],
           ["0.a.a", mockArr[0].a.a],
@@ -41,7 +41,7 @@ namespace Century {
      */
     suite("method: 'walkObjectFor'", (): void => {
       test("should return the expected lookups and values [pass 1]", (): void => {
-        assert.deepEqual(OMObjectUtils.walkObjectByValueType(mockObj, Object), [
+        assert.deepEqual(ObjectUtils.walkObjectByValueType(mockObj, Object), [
           ["", mockObj],
           ["a", mockObj.a],
           ["a.a", mockObj.a.a],
@@ -50,7 +50,7 @@ namespace Century {
       });
 
       test("should return the expected lookups and values [pass 2]", (): void => {
-        assert.deepEqual(OMObjectUtils.walkObjectByValueType(mockArr, Object), [
+        assert.deepEqual(ObjectUtils.walkObjectByValueType(mockArr, Object), [
           ["0", mockArr[0]],
           ["0.a", mockArr[0].a],
           ["0.a.a", mockArr[0].a.a],

@@ -26,14 +26,14 @@ namespace Century {
      * Object.
      */
     @property({ type: Object })
-    public sortHandlers: OMHandlerUtils.SortHandler[];
+    public sortHandlers: HandlerUtils.SortHandler[];
 
     /**
      * An Array of merge handlers that instruct the behaviour how to handle changes in Objects found within the target
      * Object.
      */
     @property({ type: Object })
-    public mergeHandlers: OMHandlerUtils.MergeHandler[];
+    public mergeHandlers: HandlerUtils.MergeHandler[];
 
     /**
      * A backup copy of the target.
@@ -67,13 +67,13 @@ namespace Century {
           continue;
         }
 
-        const searchResults = OMHandlerUtils.getSearchObject(sortHandler, {
+        const searchResults = HandlerUtils.getSearchObject(sortHandler, {
           target: this.target,
           original: this.original
         });
 
-        const pickKeys = R.curry(OMHandlerUtils.pickRelevantKeys)(sortHandler);
-        const findIndex = R.curry(OMDiffUtils.findIndexByProp)(sortHandler.itemSignature);
+        const pickKeys = R.curry(HandlerUtils.pickRelevantKeys)(sortHandler);
+        const findIndex = R.curry(DiffUtils.findIndexByProp)(sortHandler.itemSignature);
 
         /**
          * Added lists are Arrays that have been added to the target Object, and therefore have no common parent within
@@ -81,7 +81,7 @@ namespace Century {
          *
          * Added lists can only emit the following event: "inherited-addition"
          */
-        for (const { target } of OMHandlerUtils.retrieveAddedLists(sortHandler, searchResults)) {
+        for (const { target } of HandlerUtils.retrieveAddedLists(sortHandler, searchResults)) {
           for (const inheritedAddition of target[1]) {
             await sortHandler.handler("inherited-addition", target[0], pickKeys(inheritedAddition), {
               ref: inheritedAddition,
@@ -96,10 +96,10 @@ namespace Century {
          *
          * Shared lists can emit any of the following events: "removal", "move", and "addition".
          */
-        for (const { target, original } of OMHandlerUtils.retrieveSharedLists(sortHandler, searchResults)) {
-          const extractDeviants = R.curry(OMDiffUtils.extractDeviantsByProp)(sortHandler.itemSignature);
-          const generateArraySort = R.curry(OMDiffUtils.generateArraySortByProp)(sortHandler.itemSignature);
-          const extractIntersections = R.curry(OMDiffUtils.extractIntersectionsByProp)(sortHandler.itemSignature);
+        for (const { target, original } of HandlerUtils.retrieveSharedLists(sortHandler, searchResults)) {
+          const extractDeviants = R.curry(DiffUtils.extractDeviantsByProp)(sortHandler.itemSignature);
+          const generateArraySort = R.curry(DiffUtils.generateArraySortByProp)(sortHandler.itemSignature);
+          const extractIntersections = R.curry(DiffUtils.extractIntersectionsByProp)(sortHandler.itemSignature);
 
           for (const removal of extractDeviants(original[1], target[1])) {
             await sortHandler.handler("removal", target[0], pickKeys(removal), {
@@ -129,7 +129,7 @@ namespace Century {
          *
          * Removed lists can only emit the following event: "inherited-removal"
          */
-        for (const { original } of OMHandlerUtils.retrieveRemovedLists(sortHandler, searchResults)) {
+        for (const { original } of HandlerUtils.retrieveRemovedLists(sortHandler, searchResults)) {
           for (const inheritedRemoval of original[1]) {
             await sortHandler.handler("inherited-removal", original[0], pickKeys(inheritedRemoval), {
               ref: inheritedRemoval,
@@ -145,20 +145,20 @@ namespace Century {
           continue;
         }
 
-        const searchResults = OMHandlerUtils.getSearchObject(mergeHandler, {
+        const searchResults = HandlerUtils.getSearchObject(mergeHandler, {
           target: this.target,
           original: this.original
         });
 
-        const pickKeys = R.curry(OMHandlerUtils.pickRelevantKeys)(mergeHandler);
+        const pickKeys = R.curry(HandlerUtils.pickRelevantKeys)(mergeHandler);
 
         /**
          * Shared Objects are Objects that are found in both the target Object and the original Object.
          *
          * Shared Object can onl emit the following event: "update".
          */
-        for (const sharedObject of OMHandlerUtils.retrieveSharedObjects(mergeHandler, searchResults)) {
-          const merge = OMDiffUtils.generateObjectMerge(
+        for (const sharedObject of HandlerUtils.retrieveSharedObjects(mergeHandler, searchResults)) {
+          const merge = DiffUtils.generateObjectMerge(
             pickKeys(sharedObject.original[1]),
             pickKeys(sharedObject.target[1])
           );
@@ -228,9 +228,9 @@ namespace Century {
      * @param {Object}   target       - The target Object
      */
     @observe("sortHandlers, target")
-    public handleSortHandersAssigned(sortHandlers: OMHandlerUtils.SortHandler[], target: T): void {
+    public handleSortHandersAssigned(sortHandlers: HandlerUtils.SortHandler[], target: T): void {
       for (const sortHandler of sortHandlers) {
-        const searchLitmus = OMObjectUtils.walkObjectByLookupRegex(target, sortHandler.search);
+        const searchLitmus = ObjectUtils.walkObjectByLookupRegex(target, sortHandler.search);
 
         if (searchLitmus.some((objectPart) => objectPart[1].constructor !== Array)) {
           console.warn("Expected all search results to be Arrays, please refine the search Regex: ", sortHandler);
@@ -249,9 +249,9 @@ namespace Century {
      * @param {Object}   target        - The target Object
      */
     @observe("mergeHandlers, target")
-    public handleMergeHandlersAssigned(mergeHandlers: OMHandlerUtils.MergeHandler[], target: T): void {
+    public handleMergeHandlersAssigned(mergeHandlers: HandlerUtils.MergeHandler[], target: T): void {
       for (const mergeHandler of mergeHandlers) {
-        const searchLitmus = OMObjectUtils.walkObjectByLookupRegex(target, mergeHandler.search);
+        const searchLitmus = ObjectUtils.walkObjectByLookupRegex(target, mergeHandler.search);
 
         if (searchLitmus.some((objectPart) => objectPart[1].constructor !== Object)) {
           console.warn("Expected all search results to be Objects, please refine the search Regex: ", mergeHandler);
@@ -269,7 +269,7 @@ namespace Century {
      * @param {String[]} path - An Array of Object keys forming a lookup path
      */
     private markTargetPathAsPristine(path: string[]): void {
-      const lookup = OMPathUtils.pathToLookup(["target", ...path]);
+      const lookup = PathUtils.pathToLookup(["target", ...path]);
 
       this.set(`${lookup}.$dirty`, false);
       this.set(`${lookup}.$pristine`, true);
@@ -282,7 +282,7 @@ namespace Century {
      * @param {String[]} path - An Array of Object keys forming a lookup path
      */
     private markTargetPathAsDirty(path: string[]): void {
-      const lookup = OMPathUtils.pathToLookup(["target", ...path]);
+      const lookup = PathUtils.pathToLookup(["target", ...path]);
 
       this.set(`${lookup}.$dirty`, true);
       this.set(`${lookup}.$pristine`, false);
@@ -295,7 +295,7 @@ namespace Century {
      * @param {String[]} path - An Array of Object keys forming a lookup path
      */
     private markTargetPathAsValid(path: string[]): void {
-      const lookup = OMPathUtils.pathToLookup(["target", ...path]);
+      const lookup = PathUtils.pathToLookup(["target", ...path]);
 
       this.set(`${lookup}.$valid`, true);
       this.set(`${lookup}.$invalid`, false);
@@ -308,7 +308,7 @@ namespace Century {
      * @param {String[]} path - An Array of Object keys forming a lookup path
      */
     private markTargetPathAsInvalid(path: string[]): void {
-      const lookup = OMPathUtils.pathToLookup(["target", ...path]);
+      const lookup = PathUtils.pathToLookup(["target", ...path]);
 
       this.set(`${lookup}.$valid`, false);
       this.set(`${lookup}.$invalid`, true);
@@ -322,7 +322,7 @@ namespace Century {
      * @param {String[]} path - An Array of Object keys forming a lookup path
      */
     private setTargetPathRoot(root: string, path: string[]): void {
-      this.set(`${OMPathUtils.pathToLookup(["target", ...path])}.$root`, root);
+      this.set(`${PathUtils.pathToLookup(["target", ...path])}.$root`, root);
     }
 
     /**
@@ -333,16 +333,16 @@ namespace Century {
      * @param {String[]} path   - An Array of Object keys forming a lookup path
      */
     private setTargetPathErrors(errors: ValidationError[], path: string[]): void {
-      this.set(`${OMPathUtils.pathToLookup(["target", ...path])}.$errors`, errors);
+      this.set(`${PathUtils.pathToLookup(["target", ...path])}.$errors`, errors);
     }
 
     /**
      * This method will initialise the root path for every Object in the target Object.
      */
     private prepareTargetRoots(): void {
-      for (const [lookup] of OMObjectUtils.walkObjectByValueType(this.target, Object)) {
-        const path = OMPathUtils.lookupToPath(lookup);
-        const root = OMPathUtils.pathToRoot(path);
+      for (const [lookup] of ObjectUtils.walkObjectByValueType(this.target, Object)) {
+        const path = PathUtils.lookupToPath(lookup);
+        const root = PathUtils.pathToRoot(path);
 
         this.setTargetPathRoot(root, path);
       }
@@ -354,11 +354,11 @@ namespace Century {
      * @param {Object[]} errors - The errors to be populated throughout the target Object
      */
     private processTargetErrors(errors: ValidationError[]): void {
-      for (const [lookup] of OMObjectUtils.walkObjectByValueType(this.target, Object)) {
-        const path = OMPathUtils.lookupToPath(lookup);
-        const root = OMPathUtils.pathToRoot(path);
+      for (const [lookup] of ObjectUtils.walkObjectByValueType(this.target, Object)) {
+        const path = PathUtils.lookupToPath(lookup);
+        const root = PathUtils.pathToRoot(path);
 
-        this.assignTargetErrorsForPath(OMPathUtils.getErrorsForRoot(errors, root, true), path);
+        this.assignTargetErrorsForPath(PathUtils.getErrorsForRoot(errors, root, true), path);
       }
     }
 

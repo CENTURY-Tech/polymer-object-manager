@@ -1,11 +1,11 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "rootDir": "./src/main",
+    "rootDir": "src/main",
     "outDir": "."
   },
   "include": [
-    "./src/main",
-    "./typings"
+    "src/main",
+    "typings"
   ]
 }

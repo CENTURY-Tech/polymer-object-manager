@@ -1,8 +1,8 @@
 namespace Century {
 
-  sinon.spy(Century["OMPathUtils"], "pathToRoot");
-  sinon.spy(Century["OMPathUtils"], "pathToLookup");
-  sinon.spy(Century["OMPathUtils"], "lookupToPath");
+  sinon.spy((Century as any).PathUtils, "pathToRoot");
+  sinon.spy((Century as any).PathUtils, "pathToLookup");
+  sinon.spy((Century as any).PathUtils, "lookupToPath");
 
   suite("behaviour: 'ObjectManagement'", (): void => {
     let testComponent: any;
@@ -33,7 +33,7 @@ namespace Century {
 
       test("should call Polymers 'set' method to reset the target", (): void => {
         testComponent.resetChanges();
-        assert((<Sinon.SinonSpy>testComponent.set).calledWith("target"));
+        assert((testComponent.set as Sinon.SinonSpy).calledWith("target"));
       });
 
       test("should set the target with a cloned copy of the original [pass 1]", (): void => {
@@ -103,7 +103,7 @@ namespace Century {
 
       test("should call the 'prepareTargetRoots' method when it is set", (): void => {
         testComponent.handleTargetUpdated({ base: mockObj, path: "target" });
-        assert((<Sinon.SinonSpy>testComponent.prepareTargetRoots).called);
+        assert((testComponent.prepareTargetRoots as Sinon.SinonSpy).called);
       });
 
       test("should mark the target Object as pristine when it is set", (): void => {
@@ -133,14 +133,14 @@ namespace Century {
     suite("method: 'markTargetPathAsPristine'", (): void => {
       test("should call Polymers 'set' method with the correct values [pass 1]", (): void => {
         testComponent.markTargetPathAsPristine([]);
-        assert((<Sinon.SinonSpy>testComponent.set).calledWith("target.$dirty", false));
-        assert((<Sinon.SinonSpy>testComponent.set).calledWith("target.$pristine", true));
+        assert((testComponent.set as Sinon.SinonSpy).calledWith("target.$dirty", false));
+        assert((testComponent.set as Sinon.SinonSpy).calledWith("target.$pristine", true));
       });
 
       test("should call Polymers 'set' method with the correct values [pass 2]", (): void => {
         testComponent.markTargetPathAsPristine(["foo"]);
-        assert((<Sinon.SinonSpy>testComponent.set).calledWith("target.foo.$dirty", false));
-        assert((<Sinon.SinonSpy>testComponent.set).calledWith("target.foo.$pristine", true));
+        assert((testComponent.set as Sinon.SinonSpy).calledWith("target.foo.$dirty", false));
+        assert((testComponent.set as Sinon.SinonSpy).calledWith("target.foo.$pristine", true));
       });
     });
 
@@ -150,14 +150,14 @@ namespace Century {
     suite("method: 'markTargetPathAsDirty'", (): void => {
       test("should call Polymers 'set' method with the correct values [pass 1]", (): void => {
         testComponent.markTargetPathAsDirty([]);
-        assert((<Sinon.SinonSpy>testComponent.set).calledWith("target.$dirty", true));
-        assert((<Sinon.SinonSpy>testComponent.set).calledWith("target.$pristine", false));
+        assert((testComponent.set as Sinon.SinonSpy).calledWith("target.$dirty", true));
+        assert((testComponent.set as Sinon.SinonSpy).calledWith("target.$pristine", false));
       });
 
       test("should call Polymers 'set' method with the correct values [pass 2]", (): void => {
         testComponent.markTargetPathAsDirty(["foo"]);
-        assert((<Sinon.SinonSpy>testComponent.set).calledWith("target.foo.$dirty", true));
-        assert((<Sinon.SinonSpy>testComponent.set).calledWith("target.foo.$pristine", false));
+        assert((testComponent.set as Sinon.SinonSpy).calledWith("target.foo.$dirty", true));
+        assert((testComponent.set as Sinon.SinonSpy).calledWith("target.foo.$pristine", false));
       });
     });
 
@@ -167,14 +167,14 @@ namespace Century {
     suite("method: 'markTargetPathAsValid'", (): void => {
       test("should call Polymers 'set' method with the correct values [pass 1]", (): void => {
         testComponent.markTargetPathAsValid([]);
-        assert((<Sinon.SinonSpy>testComponent.set).calledWith("target.$valid", true));
-        assert((<Sinon.SinonSpy>testComponent.set).calledWith("target.$invalid", false));
+        assert((testComponent.set as Sinon.SinonSpy).calledWith("target.$valid", true));
+        assert((testComponent.set as Sinon.SinonSpy).calledWith("target.$invalid", false));
       });
 
       test("should call Polymers 'set' method with the correct values [pass 2]", (): void => {
         testComponent.markTargetPathAsValid(["foo"]);
-        assert((<Sinon.SinonSpy>testComponent.set).calledWith("target.foo.$valid", true));
-        assert((<Sinon.SinonSpy>testComponent.set).calledWith("target.foo.$invalid", false));
+        assert((testComponent.set as Sinon.SinonSpy).calledWith("target.foo.$valid", true));
+        assert((testComponent.set as Sinon.SinonSpy).calledWith("target.foo.$invalid", false));
       });
     });
 
@@ -184,14 +184,14 @@ namespace Century {
     suite("method: 'markTargetPathAsInvalid'", (): void => {
       test("should call Polymers 'set' method with the correct values [pass 1]", (): void => {
         testComponent.markTargetPathAsInvalid([]);
-        assert((<Sinon.SinonSpy>testComponent.set).calledWith("target.$valid", false));
-        assert((<Sinon.SinonSpy>testComponent.set).calledWith("target.$invalid", true));
+        assert((testComponent.set as Sinon.SinonSpy).calledWith("target.$valid", false));
+        assert((testComponent.set as Sinon.SinonSpy).calledWith("target.$invalid", true));
       });
 
       test("should call Polymers 'set' method with the correct values [pass 2]", (): void => {
         testComponent.markTargetPathAsInvalid(["foo"]);
-        assert((<Sinon.SinonSpy>testComponent.set).calledWith("target.foo.$valid", false));
-        assert((<Sinon.SinonSpy>testComponent.set).calledWith("target.foo.$invalid", true));
+        assert((testComponent.set as Sinon.SinonSpy).calledWith("target.foo.$valid", false));
+        assert((testComponent.set as Sinon.SinonSpy).calledWith("target.foo.$invalid", true));
       });
     });
 
@@ -201,12 +201,12 @@ namespace Century {
     suite("method: 'setTargetPathRoot'", (): void => {
       test("should call Polymers 'set' method with the correct values [pass 1]", (): void => {
         testComponent.setTargetPathRoot("rooty", []);
-        assert((<Sinon.SinonSpy>testComponent.set).calledWith("target.$root", "rooty"));
+        assert((testComponent.set as Sinon.SinonSpy).calledWith("target.$root", "rooty"));
       });
 
       test("should call Polymers 'set' method with the correct values [pass 2]", (): void => {
         testComponent.setTargetPathRoot("rooty", ["foo"]);
-        assert((<Sinon.SinonSpy>testComponent.set).calledWith("target.foo.$root", "rooty"));
+        assert((testComponent.set as Sinon.SinonSpy).calledWith("target.foo.$root", "rooty"));
       });
     });
 
@@ -216,12 +216,12 @@ namespace Century {
     suite("method: 'setTargetPathErrors'", (): void => {
       test("should call Polymers 'set' method with the correct values [pass 1]", (): void => {
         testComponent.setTargetPathErrors(mockErrors, []);
-        assert((<Sinon.SinonSpy>testComponent.set).calledWith("target.$errors", mockErrors));
+        assert((testComponent.set as Sinon.SinonSpy).calledWith("target.$errors", mockErrors));
       });
 
       test("should call Polymers 'set' method with the correct values [pass 2]", (): void => {
         testComponent.setTargetPathErrors(mockErrors, ["a"]);
-        assert((<Sinon.SinonSpy>testComponent.set).calledWith("target.a.$errors", mockErrors));
+        assert((testComponent.set as Sinon.SinonSpy).calledWith("target.a.$errors", mockErrors));
       });
     });
 
@@ -235,10 +235,10 @@ namespace Century {
 
       test("should have recursively prepared the target roots upon completion", (): void => {
         testComponent.prepareTargetRoots();
-        assert["nestedPropertyVal"](testComponent.target, "$root", "#/");
-        assert["nestedPropertyVal"](testComponent.target, "a.$root", "#/a");
-        assert["nestedPropertyVal"](testComponent.target, "b.$root", "#/b");
-        assert["nestedPropertyVal"](testComponent.target, "a.a.$root", "#/a/a");
+        (assert as any).nestedPropertyVal(testComponent.target, "$root", "#/");
+        (assert as any).nestedPropertyVal(testComponent.target, "a.$root", "#/a");
+        (assert as any).nestedPropertyVal(testComponent.target, "b.$root", "#/b");
+        (assert as any).nestedPropertyVal(testComponent.target, "a.a.$root", "#/a/a");
       });
     });
 
@@ -252,10 +252,10 @@ namespace Century {
 
       test("should have recursively prepared the target errors upon completion", (): void => {
         testComponent.processTargetErrors(mockErrors);
-        assert["deepNestedPropertyVal"](testComponent.target, "$errors", mockErrors);
-        assert["deepNestedPropertyVal"](testComponent.target, "a.$errors", [mockErrors[1], mockErrors[3]]);
-        assert["deepNestedPropertyVal"](testComponent.target, "b.$errors", [mockErrors[2]]);
-        assert["deepNestedPropertyVal"](testComponent.target, "a.a.$errors", [mockErrors[3]]);
+        (assert as any).deepNestedPropertyVal(testComponent.target, "$errors", mockErrors);
+        (assert as any).deepNestedPropertyVal(testComponent.target, "a.$errors", [mockErrors[1], mockErrors[3]]);
+        (assert as any).deepNestedPropertyVal(testComponent.target, "b.$errors", [mockErrors[2]]);
+        (assert as any).deepNestedPropertyVal(testComponent.target, "a.a.$errors", [mockErrors[3]]);
       });
     });
 
@@ -287,38 +287,38 @@ namespace Century {
 
       test("should correctly update the target's lookup validity keys (with errors) [pass 1]", (): void => {
         testComponent.assignTargetErrorsForPath(mockErrors, []);
-        assert((<Sinon.SinonSpy>testComponent.markTargetPathAsValid).notCalled);
-        assert((<Sinon.SinonSpy>testComponent.markTargetPathAsInvalid).calledWith([]));
+        assert((testComponent.markTargetPathAsValid as Sinon.SinonSpy).notCalled);
+        assert((testComponent.markTargetPathAsInvalid as Sinon.SinonSpy).calledWith([]));
       });
 
       test("should correctly update the target's lookup validity keys (with errors) [pass 2]", (): void => {
         testComponent.assignTargetErrorsForPath(mockErrors, ["b"]);
-        assert((<Sinon.SinonSpy>testComponent.markTargetPathAsValid).notCalled);
-        assert((<Sinon.SinonSpy>testComponent.markTargetPathAsInvalid).calledWith(["b"]));
+        assert((testComponent.markTargetPathAsValid as Sinon.SinonSpy).notCalled);
+        assert((testComponent.markTargetPathAsInvalid as Sinon.SinonSpy).calledWith(["b"]));
       });
 
       test("should correctly update the target's lookup validity keys (with errors) [pass 3]", (): void => {
         testComponent.assignTargetErrorsForPath(mockErrors, ["a", "a"]);
-        assert((<Sinon.SinonSpy>testComponent.markTargetPathAsValid).notCalled);
-        assert((<Sinon.SinonSpy>testComponent.markTargetPathAsInvalid).calledWith(["a", "a"]));
+        assert((testComponent.markTargetPathAsValid as Sinon.SinonSpy).notCalled);
+        assert((testComponent.markTargetPathAsInvalid as Sinon.SinonSpy).calledWith(["a", "a"]));
       });
 
       test("should correctly update the target's lookup validity keys (without errors) [pass 1]", (): void => {
         testComponent.assignTargetErrorsForPath([], []);
-        assert((<Sinon.SinonSpy>testComponent.markTargetPathAsValid).calledWith([]));
-        assert((<Sinon.SinonSpy>testComponent.markTargetPathAsInvalid).notCalled);
+        assert((testComponent.markTargetPathAsValid as Sinon.SinonSpy).calledWith([]));
+        assert((testComponent.markTargetPathAsInvalid as Sinon.SinonSpy).notCalled);
       });
 
       test("should correctly update the target's lookup validity keys (without errors) [pass 2]", (): void => {
         testComponent.assignTargetErrorsForPath([], ["b"]);
-        assert((<Sinon.SinonSpy>testComponent.markTargetPathAsValid).calledWith(["b"]));
-        assert((<Sinon.SinonSpy>testComponent.markTargetPathAsInvalid).notCalled);
+        assert((testComponent.markTargetPathAsValid as Sinon.SinonSpy).calledWith(["b"]));
+        assert((testComponent.markTargetPathAsInvalid as Sinon.SinonSpy).notCalled);
       });
 
       test("should correctly update the target's lookup validity keys (without errors) [pass 3]", (): void => {
         testComponent.assignTargetErrorsForPath([], ["a", "a"]);
-        assert((<Sinon.SinonSpy>testComponent.markTargetPathAsValid).calledWith(["a", "a"]));
-        assert((<Sinon.SinonSpy>testComponent.markTargetPathAsInvalid).notCalled);
+        assert((testComponent.markTargetPathAsValid as Sinon.SinonSpy).calledWith(["a", "a"]));
+        assert((testComponent.markTargetPathAsInvalid as Sinon.SinonSpy).notCalled);
       });
     });
   });

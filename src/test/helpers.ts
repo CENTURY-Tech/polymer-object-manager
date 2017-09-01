@@ -1,7 +1,7 @@
 namespace Century {
 
   @component("test-element")
-  @behavior(Century["ObjectManagement"])
+  @behavior((Century as any).ObjectManagement)
   export class TestElement extends polymer.Base {
 
     public ready(): void {

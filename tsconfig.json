@@ -4,6 +4,7 @@
     "target": "es5",
     "alwaysStrict": true,
     "skipLibCheck": true,
+    "noImplicitAny": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "declaration": true,
@@ -11,11 +12,11 @@
     "experimentalDecorators": true
   },
   "include": [
-    "./src",
-    "./typings"
+    "src",
+    "typings"
   ],
   "exclude": [
-    "./bower_components",
-    "./node_modules"
+    "bower_components",
+    "node_modules"
   ]
 }
