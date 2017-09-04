@@ -2,16 +2,15 @@
 
 @Library("utils")
 
-import io.ctek.jenkins.v2.node.NodeComponentBuild
+import io.ctek.jenkins.v3.node.NodeComponentBuild
 
 def component = new NodeComponentBuild(this)
 
 if(BRANCH_NAME != "master") {
   node {
-    component.build "build-dev --branch ${BRANCH_NAME}";
-    component.release "release-dev --branch ${BRANCH_NAME}";
+    component.build "prepare:dist";
+    component.release();
     component.upload();
-    component.updateBuildName();
   }
 }
 else {
@@ -44,10 +43,9 @@ else {
       node {
         echo("Releasing with type: ${env.RELEASE_TYPE}");
 
-        component.build "build-prod  --bump ${env.RELEASE_TYPE}";
-        component.release "release-prod";
+        component.build "prepare:dist";
+        component.release "${env.RELEASE_TYPE}";
         component.upload();
-        component.updateBuildName();
       }
     }
   }
