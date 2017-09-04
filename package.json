@@ -9,7 +9,7 @@
     "copy:html-dist": "cpy '**/*.html' '../../dist' --cwd='src/main' --parents",
     "copy:html-test": "cpy '**/*.html' '../../test' --cwd='src/test' --parents",
     "copy:bower-dist": "cpy 'bower.json' './dist'",
-    "docs": "rm -dr docs && typedoc --tsconfig tsconfig.main.json --excludePrivate --mode file --name \"Object Management\" --out docs",
+    "docs": "rm -rf docs && typedoc --tsconfig tsconfig.main.json --excludePrivate --mode file --name \"Object Management\" --out docs",
     "install": "bower i && typings i",
     "install:bower": "rm -rf bower_components && bower i",
     "install:typings": "rm -rf typings && typings i",
