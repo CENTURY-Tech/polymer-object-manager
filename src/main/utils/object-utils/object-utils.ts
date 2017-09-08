@@ -18,7 +18,7 @@ namespace Century {
      *
      * @returns {ObjectPart[]} An Array of the Object's constituent parts
      */
-    export const deconstructObject: <T extends object>(obj: T) => ObjectPart[] = R.compose<any, any, any>(
+    export const deconstructObject: <T extends object>(obj: T) => ObjectPart[] = R.compose(
       R.chain(([key1, value1]: ObjectPart): any => {
         if (key1.startsWith("$")) {
           return [];
@@ -29,6 +29,26 @@ namespace Century {
         }
       }),
       R.toPairs
+    );
+
+    /**
+     * This method will recursively strip any dollar properties from the Object provided.
+     *
+     * @param {Object} obj - The Object to be mutated
+     *
+     * @returns {Object} The provided Object recursively stripped of any dollar properties
+     */
+    export const stripDollarProperties: <T extends object, U extends object>(obj: T) => U = R.ifElse(
+      R.is(Array),
+      R.map((_) => stripDollarProperties(_)),
+      R.compose(
+        R.mapObjIndexed(R.when(R.is(Object), (_) => stripDollarProperties(_))),
+        R.pickBy(R.pipe(
+          R.nthArg(1),
+          R.startsWith("$"),
+          R.not,
+        )),
+      )
     );
 
     /**

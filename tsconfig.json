@@ -9,7 +9,11 @@
     "noUnusedParameters": true,
     "declaration": true,
     "removeComments": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "lib": [
+      "dom",
+      "es2015"
+    ]
   },
   "include": [
     "src",

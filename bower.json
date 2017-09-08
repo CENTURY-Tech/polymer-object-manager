@@ -8,8 +8,8 @@
   ],
   "dependencies": {
     "es6-shim": "~0",
-    "js-imports": "~2",
-    "polymer": "1.7.0"
+    "js-imports": "~3",
+    "polymer": "^1.9.3"
   },
   "devDependencies": {
     "polymer-ts": "0.1.28",
@@ -19,6 +19,8 @@
   },
   "resolutions": {
     "chai": "4.0.1",
-    "polymer-ts": "0.1.28"
+    "polymer-ts": "0.1.28",
+    "webcomponentsjs": "^0.7.24",
+    "polymer": "^1.9.3"
   }
 }

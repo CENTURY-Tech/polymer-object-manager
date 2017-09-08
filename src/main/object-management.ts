@@ -150,12 +150,15 @@ namespace Century {
           original: this.original
         });
 
-        const pickKeys = R.curry(HandlerUtils.pickRelevantKeys)(mergeHandler);
+        const pickKeys = R.compose(
+          R.curry(HandlerUtils.pickRelevantKeys)(mergeHandler),
+          ObjectUtils.stripDollarProperties
+        );
 
         /**
          * Shared Objects are Objects that are found in both the target Object and the original Object.
          *
-         * Shared Object can onl emit the following event: "update".
+         * Shared Object can only emit the following event: "update".
          */
         for (const sharedObject of HandlerUtils.retrieveSharedObjects(mergeHandler, searchResults)) {
           const merge = DiffUtils.generateObjectMerge(
@@ -163,7 +166,7 @@ namespace Century {
             pickKeys(sharedObject.target[1])
           );
 
-          if (!R.isEmpty(<any>merge)) {
+          if (!R.isEmpty(merge)) {
             await mergeHandler.handler("update", sharedObject.target[0], merge, {
               targetRef: sharedObject.target[1],
               originalRef: sharedObject.original[1]
