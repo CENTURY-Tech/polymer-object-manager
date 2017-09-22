@@ -41,13 +41,16 @@ namespace Century {
     export const stripDollarProperties: <T extends object, U extends object>(obj: T) => U = R.ifElse(
       R.is(Array),
       R.map((_) => stripDollarProperties(_)),
-      R.compose(
-        R.mapObjIndexed(R.when(R.is(Object), (_) => stripDollarProperties(_))),
-        R.pickBy(R.pipe(
-          R.nthArg(1),
-          R.startsWith("$"),
-          R.not,
-        )),
+      R.when(
+        R.is(Object),
+        R.compose(
+          R.mapObjIndexed(R.when(R.is(Object), (_) => stripDollarProperties(_))),
+          R.pickBy(R.pipe(
+            R.nthArg(1),
+            R.startsWith("$"),
+            R.not,
+          )),
+        )
       )
     );
 
