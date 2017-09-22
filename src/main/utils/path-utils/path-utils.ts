@@ -34,7 +34,7 @@ namespace Century {
      * @returns {String} An Array of Object keys forming a lookup path
      */
     export function rootToPath(root: string): string[] {
-      return R.compose(R.reject<string>(R.isEmpty), R.tail as (x: string[]) => string[], R.split("/"))(root);
+      return R.pipe<string, string[], string[], string[]>(R.split("/"), R.tail, R.reject(R.isEmpty))(root);
     }
 
     /**
@@ -45,7 +45,7 @@ namespace Century {
      * @returns {String} An Array of Object keys forming a lookup path
      */
     export function lookupToPath(lookup: string): string[] {
-      return R.compose(R.reject<string>(R.isEmpty), R.split("."))(lookup);
+      return R.pipe<string, string[], string[]>(R.split("."), R.reject(R.isEmpty))(lookup);
     }
 
     /**
